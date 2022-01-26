@@ -1,0 +1,81 @@
+# This workflow will add 3 jobs:
+# - lint: uses `flake8` to lint the code and add comments if it is a PR
+# - check-format: checks whether any files would be reformatted by `black`
+# - test: runs `pytest`.  Uses `pipenv`, `poetry`, or `pip` depending on the files present
+
+name: Python Code Quality
+
+on:
+  workflow_call:
+    inputs:
+      # Python version is required in order to make sure that pytest and black can be run correctly
+      python-version:
+        required: true
+        type: string
+jobs:
+  lint:
+    name: Run python linters
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # Setup the reviewdog app
+      - uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest # Optional. [latest,nightly,v.X.Y.Z]
+      # Install any linters we will use
+      - name: Install linters
+        run: |
+          pip install flake8
+      - name: Run linters
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          reviewdog -reporter="github-pr-review" -runners="flake8" -tee
+  check-format:
+    name: Check formatting
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code
+      - uses: actions/checkout@v2
+      # Install a fixed version of python
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version }}
+      # Check the files with black
+      - run: |
+          pip install black
+          black --check .
+  test:
+    name: Run pytest
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code
+      - uses: actions/checkout@v2
+      # Install a fixed version of python
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version }}
+      # if there's a Pipfile, use pipenv
+      - name: Test with pipenv
+        if: hashFiles('Pipfile') != ''
+        run: |
+          pip install pipenv
+          pipenv sync --dev
+          pipenv run python -m pytest -v
+      # check for a poetry lockfile (since we can't rely on pyproject.toml indicating a poetry project)
+      - name: Test with poetry
+        if: hashFiles('poetry.lock') != ''
+        run: |
+          pip install poetry
+          poetry install
+          poetry run python -m pytest -v
+      # no pipfile or poetry lockfile, so we'll just install pytest with pip and run that
+      - name: Test with pip
+        if: hashFiles('Pipfile') == '' && hashFiles('poetry.lock') == ''
+        run: |
+          pip install pytest
+          python -m pytest -v
