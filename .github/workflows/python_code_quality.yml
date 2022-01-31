@@ -32,7 +32,8 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          reviewdog -reporter="github-pr-review" -runners="flake8" -tee
+          flake8 . | reviewdog -reporter="github-pr-review" -f flake8 -name flake8 -level info  -tee
+
   check-format:
     name: Check formatting
     runs-on: ubuntu-latest
