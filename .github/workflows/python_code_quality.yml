@@ -12,6 +12,10 @@ on:
       python-version:
         required: true
         type: string
+      run_tests:
+        required: false
+        type: boolean
+        default: false
 jobs:
   lint:
     name: Run python linters
@@ -61,6 +65,7 @@ jobs:
   test:
     name: Run pytest
     runs-on: ubuntu-latest
+    if: ${{ inputs.run_tests }}
     steps:
       # Checkout the code
       - uses: actions/checkout@v2
