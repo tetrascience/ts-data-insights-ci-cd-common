@@ -15,7 +15,10 @@ jobs:
     uses: tetrascience/ts-data-insights-ci-cd-common/.github/workflows/python_code_quality@main
     with:
       python-version: 3.7
+      run_tests: true
 ```
+
+The `run_tests` input defaults to `false` and is optional for the time being. It will default to true in the future.
 
 You can also include this as a job within existing workflows if you wish.
 
