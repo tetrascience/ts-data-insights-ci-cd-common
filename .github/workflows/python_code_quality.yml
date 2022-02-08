@@ -36,16 +36,18 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "*** FLAKE8 LINTING ***"
+          echo "::group::*** FLAKE8 LINTING ***"
           flake8 . | reviewdog -reporter="github-pr-review" -f flake8 -name flake8 -level info  -tee
-          echo "*** PYLINT LINTING ***"
+          echo "::endgroup::"
+          echo "::group::*** PYLINT LINTING ***"
           # pylint is a little trickier to run.  This command:
           # - finds all python files (output: './main.py', './src/parse.py')
           # - prints only the files and directories that are in the current directory with awk (output: 'main.py', 'src')
           # - removes duplicates with sort -u (unique)
           find . -name '*py' | awk -F / '{print $2}' | sort -u > files_for_pylint.txt
           # run these files/dirs through pylint and let reviewdog post comments
-          cat files_for_pylint | xargs pylint | reviewdog -reporter="github-pr-review" -efm="%f:%l:%c: %m" -name pylint -level info --tee
+          cat files_for_pylint.txt | xargs pylint | reviewdog -reporter="github-pr-review" -efm="%f:%l:%c: %m" -name pylint -level info --tee
+          echo "::endgroup::"
 
   check-format:
     name: Check formatting
