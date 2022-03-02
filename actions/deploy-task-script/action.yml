@@ -41,6 +41,9 @@ runs:
         npm install -g yarn
         yarn install --frozen-lockfile --prod
         echo "::endgroup::"
+        pwd
+        ls -altr
+        cat package.json
         echo "::group::Build&Publish"
         yarn run publish
         echo "::endgroup::"
