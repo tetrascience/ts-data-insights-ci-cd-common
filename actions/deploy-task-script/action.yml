@@ -17,6 +17,9 @@ runs:
   steps:
     - name: Checkout action code
       uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+
     - name: Setup Node
       uses: actions/setup-node@v2
     - name: Update git credentials
