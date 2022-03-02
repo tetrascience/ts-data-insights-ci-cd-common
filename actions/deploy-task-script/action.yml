@@ -1,0 +1,43 @@
+name: "Deploy Task Script"
+description: "Deploys the task script to the correct environment"
+inputs:
+  personal-access-token:
+    description: "Personal Access Token giving access to the Tetrascience Org"
+    required: true
+  aws-access-key:
+    description: "AWS Access Key required for publishing task scripts"
+    required: true
+  aws-access-key-secret:
+    description: "AWS secret for the provided access key"
+    required: true
+  ssh-key:
+    description: "SSH Key for pulling images into the task-script image being published"
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v2
+    - run: git config --global url."https://${{ inputs.personal-access-token }}@github.com/".insteadOf ssh://git@github.com/
+    - name: Build and Publish
+      env:
+        SSH_SECRET: ${{ inputs.ssh-key }}
+        # Needs to be in a directory that is not the main code directory
+        SSH_SECRET_DIR: "/home/runner/.ssh_secret"
+        SSH_SECRET_FILE: "secret_ssh_key"
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-access-key-secret }}
+      run: |
+        echo "Begin Publish Step"
+        echo "::group::Setup"
+        export SSH_KEY_PATH="${SSH_SECRET_DIR}/${SSH_SECRET_FILE}"
+        mkdir -p $SSH_SECRET_DIR
+        echo "$SSH_SECRET" > $SSH_KEY_PATH
+        cat $SSH_KEY_PATH | sha256sum
+        echo "::endgroup::"
+        echo "::group::Yarn install"
+        npm install -g yarn
+        yarn install --frozen-lockfile --prod
+        echo "::endgroup::"
+        echo "::group::Build&Publish"
+        yarn run publish
+        echo "::endgroup::"

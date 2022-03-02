@@ -1,0 +1,13 @@
+{
+  "name": "deploy-task-script",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "publish": "node ./index.js"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "ts-lib-artifact-builder": "github:tetrascience/ts-lib-artifact-builder"
+  }
+}
