@@ -17,8 +17,11 @@ runs:
   steps:
     - name: Setup Node
       uses: actions/setup-node@v2
-    - run: git config --global url."https://${{ inputs.personal-access-token }}@github.com/".insteadOf ssh://git@github.com/
+    - name: Update git credentials
+      shell: bash
+      run: git config --global url."https://${{ inputs.personal-access-token }}@github.com/".insteadOf ssh://git@github.com/
     - name: Build and Publish
+      shell: bash
       env:
         SSH_SECRET: ${{ inputs.ssh-key }}
         # Needs to be in a directory that is not the main code directory
