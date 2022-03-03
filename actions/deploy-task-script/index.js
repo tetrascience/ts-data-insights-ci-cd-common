@@ -98,4 +98,5 @@ const publish = async () => {
 };
 
 // FIXME: make this run only when main.  (see list updater)
+console.log(process.env);
 publish();

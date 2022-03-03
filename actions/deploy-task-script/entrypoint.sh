@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "::group::ENV"
+echo "::group::START ENV"
 env
 echo "::endgroup"
 
@@ -22,11 +22,14 @@ export AWS_SECRET_ACCESS_KEY=${INPUT_AWS_SECRET_ACCESS_KEY}
 export ARTIFACT_BUCKET=${INPUT_ARTIFACT_BUCKET}
 export ARTIFACT_PREFIX=${INPUT_ARTIFACT_PREFIX}
 
-
 # FIXME: these should not be hard coded!
 export NAMESPACE='common'
 export SLUG='abs-test-task'
 export VERSION='v0.1.3'
 echo "::endgroup::"
+
+echo "::group::GOTIME ENV"
+env
+echo "::endgroup"
 
 deploy-task-script
