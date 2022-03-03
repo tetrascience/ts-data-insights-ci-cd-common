@@ -1,9 +1,6 @@
 name: "Deploy Task Script"
 description: "Deploys the task script to the correct environment"
 inputs:
-  personal_access_token:
-    description: "Personal Access Token giving access to the Tetrascience Org"
-    required: true
   aws_access_key:
     description: "AWS Access Key required for publishing task scripts"
     required: true
@@ -15,45 +12,3 @@ inputs:
 runs:
   using: "docker"
   image: "Dockerfile"
-  args:
-    - ${{ inputs.ssh_key }}
-# runs:
-#   using: "composite"
-#   steps:
-#     - name: Checkout action code
-#       uses: actions/checkout@v2
-#       with:
-#         persist-credentials: false
-
-#     - name: Setup Node
-#       uses: actions/setup-node@v2
-#     - name: Update git credentials
-#       shell: bash
-#       run: git config --global url."https://${{ inputs.personal-access-token }}@github.com/".insteadOf ssh://git@github.com/
-#     - name: Build and Publish
-#       shell: bash
-#       env:
-#         SSH_SECRET: ${{ inputs.ssh-key }}
-#         # Needs to be in a directory that is not the main code directory
-#         SSH_SECRET_DIR: "/home/runner/.ssh_secret"
-#         SSH_SECRET_FILE: "secret_ssh_key"
-#         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key }}
-#         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-access-key-secret }}
-#       run: |
-#         echo "Begin Publish Step"
-#         echo "::group::Setup"
-#         export SSH_KEY_PATH="${SSH_SECRET_DIR}/${SSH_SECRET_FILE}"
-#         mkdir -p $SSH_SECRET_DIR
-#         echo "$SSH_SECRET" > $SSH_KEY_PATH
-#         cat $SSH_KEY_PATH | sha256sum
-#         echo "::endgroup::"
-#         echo "::group::Yarn install"
-#         npm install -g yarn
-#         yarn install --frozen-lockfile --prod
-#         echo "::endgroup::"
-#         pwd
-#         ls -altr
-#         cat package.json
-#         echo "::group::Build&Publish"
-#         yarn run publish
-#         echo "::endgroup::"

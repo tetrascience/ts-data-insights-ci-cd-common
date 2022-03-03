@@ -1,62 +1,67 @@
 #!/usr/bin/env node
+
+const core = require("@actions/core");
+
+const fs = require("fs");
 const Path = require("path");
 const _ = require("lodash");
+const simpleGit = require("simple-git");
+const rootGit = simpleGit();
+
 const { spawn } = require("child_process");
+const { getBuilder } = require("ts-lib-artifact-builder");
+const UpdateListUtil = require("ts-lib-artifact-builder/helper/update-list");
+const {
+  ARTIFACT_BUCKET,
+  ARTIFACT_PREFIX,
+  SSH_KEY_PATH,
+  COMMIT,
+  GITHUB_JOB,
+  GITHUB_RUN_NUMBER,
+  GITHUB_RUN_ATTEMPT,
+} = process.env;
 
 // FIXME: add tests with jest or something similar?
 // TODO: reorganize so these get put into src files
-const exec = async (cmd, args, options = { resolveStdout: false }) => {
-  console.log("Running:", [cmd, ...args].join(" "));
-  const { resolveStdout } = options;
-  return new Promise((res, rej) => {
-    const cp = spawn(cmd, args, options);
-    let stdout = "";
-
-    cp.stdout.on("data", (data) => {
-      console.log(`stdout: ${data}`);
-      if (resolveStdout) {
-        stdout += data;
-      }
-    });
-
-    cp.stderr.on("data", (data) => {
-      console.log(`stderr: ${data}`);
-    });
-
-    cp.on("close", (code) => {
-      console.log(`child process exited with code ${code}`);
-      if (code) {
-        rej(new Error("Non-zero exit code"));
-      }
-      res(stdout);
-    });
-  });
-};
-
 const getCodeMeta = _.once(async () => {
-  const commit = (
-    await exec("git", ["rev-parse", "--short", "HEAD"], {
-      resolveStdout: true,
-    })
-  ).trim();
+  const commit = rootGit.revparse(["--short", "HEAD"]);
+  const curTags = (await repoGit.tag({ "--points-at": "HEAD" }))
+    .trim()
+    .split("\n");
+  console.log(`Found tags that point at HEAD: ${curTags}`);
   return {
     commit,
+    githubAction: true,
+    tags: curTags,
     createdAt: new Date().toISOString(),
   };
 });
 
+const buildit = async () => {
+  const cfg = {
+    source: ".",
+    namespace: NAMESPACE,
+    slug: SLUG,
+    version: VERSION,
+    type: "task-scripts",
+    pushToEcr: PUSH_TO_ECR || false,
+    buildRecordMeta: await getCodeMeta(),
+    shouldUpdateList: false,
+    saveBuildLog: true,
+    sshPrivateKeyPath: "/root/.ssh/id_rsa",
+  };
+  console.log("--- Build config ---");
+  console.log(cfg);
+};
+
 // --- MAIN METHOD ---
 const publish = async () => {
-  const [node, script, input] = process.argv;
-  console.log(process.argv);
-  console.log(`APP: ${script} PWD: ${input}`);
   console.time("TOTAL");
-  const meta = await getCodeMeta();
+  const meta = await core.group("get code meta", getCodeMeta);
   console.info("CODE META:");
   console.info(meta);
   console.timeEnd("TOTAL");
+  core.notice("all done!");
 };
-
-module.exports = publish;
 
 publish();

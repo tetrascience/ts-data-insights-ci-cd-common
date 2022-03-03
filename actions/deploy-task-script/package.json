@@ -8,6 +8,7 @@
     "publish": "node ./index.js"
   },
   "dependencies": {
+    "@actions/core": "^1.6.0",
     "lodash": "^4.17.21",
     "ts-lib-artifact-builder": "github:tetrascience/ts-lib-artifact-builder"
   }

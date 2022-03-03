@@ -1,12 +1,12 @@
 FROM node:16
 
-RUN mkdir -p /usr/abc_test/ && \
+RUN mkdir -p /usr/local/deploy_task_script/ && \
     mkdir -p /root/.ssh/ && \
     touch /root/.ssh/known_hosts && \
     ssh-keyscan github.com >> /root/.ssh/known_hosts
 
-COPY package.json yarn.lock index.js entrypoint.sh /usr/abc_test/
+COPY package.json yarn.lock index.js entrypoint.sh /usr/local/deploy_task_script
 
-RUN chmod +x /usr/abc_test/entrypoint.sh
+RUN chmod +x /usr/deploy_task_script/entrypoint.sh
 
-ENTRYPOINT ["/usr/abc_test/entrypoint.sh"]
+ENTRYPOINT ["/usr/deploy_task_script/entrypoint.sh"]
