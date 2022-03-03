@@ -4,10 +4,12 @@ env
 echo "::endgroup"
 
 echo "::group::Setup Action"
+
+# add the provided SSH key and install the deployer
+# we need to do this step in the dockerfile because it requires SSH access to download the builder library
 echo "${INPUT_SSH_KEY}" > /root/.ssh/id_rsa
 chmod 600 /root/.ssh/id_rsa
 
-# we need to do this step in the dockerfile because it requires SSH access to download the builder library
 cd /usr/local/deploy_task_script
 yarn install --frozen-lockfile --prod
 
@@ -19,13 +21,8 @@ cd $GITHUB_WORKSPACE
 
 export AWS_ACCESS_KEY_ID=${INPUT_AWS_ACCESS_KEY}
 export AWS_SECRET_ACCESS_KEY=${INPUT_AWS_ACCESS_KEY_SECRET}
-export ARTIFACT_BUCKET=${INPUT_ARTIFACT_BUCKET}
-export ARTIFACT_PREFIX=${INPUT_ARTIFACT_PREFIX}
 
 # FIXME: these should not be hard coded!
-export NAMESPACE='common'
-export SLUG='abs-test-task'
-export VERSION='v0.1.3'
 echo "::endgroup::"
 
 echo "::group::GOTIME ENV"

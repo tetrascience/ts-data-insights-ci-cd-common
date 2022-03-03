@@ -51,6 +51,8 @@ const getCodeMeta = _.once(async () => {
   };
 });
 
+const determine_version = () => {};
+
 const buildit = async () => {
   const cfg = {
     source: ".",
@@ -67,6 +69,9 @@ const buildit = async () => {
   console.log("--- Build config ---");
   console.log(cfg);
   const builder = getBuilder(cfg);
+  const result = await builder.run();
+  console.log(result);
+
   console.log("--- list bucket ---");
   const { bucket, prefix, endpoint } = builder.getLocation();
   await listBucket(endpoint, bucket, prefix);
@@ -83,6 +88,7 @@ const listBucket = async (endpoint, bucket, prefix) => {
   console.timeEnd("scan artifacts");
   console.time("read list");
   const list = await ulu.readArtifactList("task-scripts");
+  console.log(list);
   console.timeEnd("read list");
 };
 
@@ -90,9 +96,7 @@ const listBucket = async (endpoint, bucket, prefix) => {
 const publish = async () => {
   console.time("TOTAL");
   const meta = await getCodeMeta();
-  console.info("CODE META:");
-  console.info(meta);
-  await core.group("build it", buildit);
+  await core.group("--- BUILD ---", buildit);
   console.timeEnd("TOTAL");
   core.notice("all done!");
 };
