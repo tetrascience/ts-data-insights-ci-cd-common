@@ -1,0 +1,54 @@
+name: "Deploy Task Script (composite)"
+description: "Deploys the task script to the correct environment"
+inputs:
+  aws_access_key:
+    description: "AWS Access Key required for publishing task scripts"
+    required: true
+  aws_access_key_secret:
+    description: "AWS secret for the provided access key"
+    required: true
+  ssh_key:
+    description: "SSH Key for pulling images into the task-script image being published"
+  # FIXME: what is the best strategy for these?  Force users to specify or rely on them being in the env?
+  # FIXME: I would prefer if they could be built into the action repo
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      path: composite
+    - name: Setup Node
+      uses: actions/setup-node@v2
+    - name: Do stuff
+      run: |
+        pwd
+        ls -altr
+        ls -altr composite
+
+# -      - run: git config --global url."https://${{ secrets.ALEX_PERSONAL_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
+# -      - name: Install stuff
+# -        env:
+# -          SSH_SECRET: ${{ secrets.ALEX_PERSONAL_KEY }}
+# -          # Needs to be in a directory that is not the main code directory
+# -          SSH_SECRET_DIR: "/home/runner/.ssh_secret"
+# -          SSH_SECRET_FILE: "secret_ssh_key"
+# -          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+# -          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+# -        run: |
+# -          echo "Onwards!"
+# -          echo "::group::Setup"
+# -          export SSH_KEY_PATH="${SSH_SECRET_DIR}/${SSH_SECRET_FILE}"
+# -          mkdir -p $SSH_SECRET_DIR
+# -          echo "$SSH_SECRET" > $SSH_KEY_PATH
+# -          cat $SSH_KEY_PATH | sha256sum
+# -          echo "::endgroup::"
+# -          echo "::group::Yarn install"
+# -          npm install -g yarn
+# -          yarn install --frozen-lockfile --prod
+# -          echo "::endgroup::"
+# -          echo "::group::ABC Test"
+# -          yarn run abctest
+# -          echo "::endgroup::"
+# -          echo "::group::Deploy"
+# -          yarn run deploy:ci
+# -          echo "::endgroup::"
