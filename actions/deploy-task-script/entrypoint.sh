@@ -17,8 +17,8 @@ yarn global add $PWD
 # Run the package in the current code
 cd $GITHUB_WORKSPACE
 
-export AWS_ACCESS_KEY_ID=${INPUT_AWS_ACCESS_KEY_ID}
-export AWS_SECRET_ACCESS_KEY=${INPUT_AWS_SECRET_ACCESS_KEY}
+export AWS_ACCESS_KEY_ID=${INPUT_AWS_ACCESS_KEY}
+export AWS_SECRET_ACCESS_KEY=${INPUT_AWS_ACCESS_KEY_SECRET}
 export ARTIFACT_BUCKET=${INPUT_ARTIFACT_BUCKET}
 export ARTIFACT_PREFIX=${INPUT_ARTIFACT_PREFIX}
 
@@ -30,6 +30,6 @@ echo "::endgroup::"
 
 echo "::group::GOTIME ENV"
 env
-echo "::endgroup"
+echo "::endgroup::"
 
 deploy-task-script
