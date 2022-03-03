@@ -46,6 +46,9 @@ const getCodeMeta = _.once(async () => {
 
 // --- MAIN METHOD ---
 const publish = async () => {
+  const [node, script, input] = process.argv;
+  console.log(process.argv);
+  console.log(`APP: ${script} PWD: ${input}`);
   console.time("TOTAL");
   const meta = await getCodeMeta();
   console.info("CODE META:");
