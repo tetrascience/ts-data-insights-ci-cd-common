@@ -2,6 +2,7 @@
   "name": "deploy-task-script",
   "version": "1.0.0",
   "main": "index.js",
+  "bin": "./index.js",
   "license": "MIT",
   "scripts": {
     "publish": "node ./index.js"

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const Path = require("path");
 const _ = require("lodash");
 const { spawn } = require("child_process");
@@ -55,5 +56,7 @@ const publish = async () => {
   console.info(meta);
   console.timeEnd("TOTAL");
 };
+
+module.exports = publish;
 
 publish();
