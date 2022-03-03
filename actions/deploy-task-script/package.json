@@ -10,6 +10,7 @@
   "dependencies": {
     "@actions/core": "^1.6.0",
     "lodash": "^4.17.21",
+    "simple-git": "^3.2.6",
     "ts-lib-artifact-builder": "github:tetrascience/ts-lib-artifact-builder"
   }
 }
