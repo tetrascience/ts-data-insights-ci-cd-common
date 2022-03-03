@@ -19,6 +19,13 @@ runs:
       with:
         path: composite
         repository: tetrascience/ts-data-insights-ci-cd-common
+        ref: DE-3314-github-action
+        ssh-key: ${{ inputs.ssh_key }}
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        path: ts-lib-artifact-builder
+        repository: tetrascience/ts-lib-artifact-builder
         ssh-key: ${{ inputs.ssh_key }}
     - name: Setup Node
       uses: actions/setup-node@v2
@@ -27,9 +34,15 @@ runs:
       run: |
         pwd
         ls -altr
+        echo "COMPOSITE"
         ls -altr composite
-        cd composite
-        yarn install --prod --frozen-lockfile
+        echo "BUILDER"
+        ls -altr ts-lib-artifact-builder
+        cd ts-lib-artifact-builder
+        yarn link
+        cd ../composite
+        yarn link ts-lib-artifact-builder
+        yarn install --prod
 
 # -      - run: git config --global url."https://${{ secrets.ALEX_PERSONAL_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
 # -      - name: Install stuff
