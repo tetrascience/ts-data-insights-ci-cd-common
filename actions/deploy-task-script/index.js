@@ -80,10 +80,10 @@ const listBucket = async (endpoint, bucket, prefix) => {
   });
   console.time("scan artifacts");
   const scan = await ulu.scanArtifacts("task-scripts");
-  console.endTime("scan artifacts");
+  console.timeEnd("scan artifacts");
   console.time("read list");
   const list = await ulu.readArtifactList("task-scripts");
-  console.endTime("read list");
+  console.timeEnd("read list");
 };
 
 // --- MAIN METHOD ---
@@ -98,5 +98,5 @@ const publish = async () => {
 };
 
 // FIXME: make this run only when main.  (see list updater)
-console.log(process.env);
+
 publish();
