@@ -6,7 +6,6 @@ const fs = require("fs");
 const Path = require("path");
 const _ = require("lodash");
 const simpleGit = require("simple-git");
-const rootGit = simpleGit();
 
 const { spawn } = require("child_process");
 const { getBuilder } = require("ts-lib-artifact-builder");
@@ -27,10 +26,9 @@ const {
 // FIXME: add tests with jest or something similar?
 // TODO: reorganize so these get put into src files
 const getCodeMeta = _.once(async () => {
-  const commit = rootGit.revparse(["--short", "HEAD"]);
-  const curTags = (await repoGit.tag({ "--points-at": "HEAD" }))
-    .trim()
-    .split("\n");
+  const git = simpleGit();
+  const commit = git.revparse(["--short", "HEAD"]);
+  const curTags = (await git.tag({ "--points-at": "HEAD" })).trim().split("\n");
   console.log(`Found tags that point at HEAD: ${curTags}`);
   return {
     commit,
