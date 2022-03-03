@@ -7,6 +7,6 @@ RUN mkdir -p /usr/local/deploy_task_script/ && \
 
 COPY package.json yarn.lock index.js entrypoint.sh /usr/local/deploy_task_script/
 
-RUN chmod +x /usr/deploy_task_script/entrypoint.sh
+RUN chmod +x /usr/local/deploy_task_script/entrypoint.sh
 
-ENTRYPOINT ["/usr/deploy_task_script/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/deploy_task_script/entrypoint.sh"]
