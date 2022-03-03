@@ -11,6 +11,9 @@ const { spawn } = require("child_process");
 const { getBuilder } = require("ts-lib-artifact-builder");
 const UpdateListUtil = require("ts-lib-artifact-builder/helper/update-list");
 const {
+  NAMESPACE,
+  SLUG,
+  VERSION,
   ARTIFACT_BUCKET,
   ARTIFACT_PREFIX,
   SSH_KEY_PATH,

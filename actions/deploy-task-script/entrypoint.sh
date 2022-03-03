@@ -16,6 +16,10 @@ cd $GITHUB_WORKSPACE
 
 export AWS_ACCESS_KEY_ID=${INPUT_AWS_ACCESS_KEY_ID}
 export AWS_SECRET_ACCESS_KEY=${INPUT_AWS_SECRET_ACCESS_KEY}
+
+export NAMESPACE='common'
+export SLUG='abs-test-task'
+export VERSION='v0.1.3'
 echo "::endgroup::"
 
 deploy-task-script
