@@ -5,7 +5,7 @@ RUN mkdir -p /usr/local/deploy_task_script/ && \
     touch /root/.ssh/known_hosts && \
     ssh-keyscan github.com >> /root/.ssh/known_hosts
 
-COPY package.json yarn.lock index.js entrypoint.sh /usr/local/deploy_task_script
+COPY package.json yarn.lock index.js entrypoint.sh /usr/local/deploy_task_script/
 
 RUN chmod +x /usr/deploy_task_script/entrypoint.sh
 
