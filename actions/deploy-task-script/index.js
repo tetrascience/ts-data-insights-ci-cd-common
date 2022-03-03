@@ -7,7 +7,6 @@ const Path = require("path");
 const _ = require("lodash");
 const simpleGit = require("simple-git");
 
-const { spawn } = require("child_process");
 const { getBuilder } = require("ts-lib-artifact-builder");
 const UpdateListUtil = require("ts-lib-artifact-builder/helper/update-list");
 const {
@@ -67,7 +66,7 @@ const buildit = async () => {
   };
   console.log("--- Build config ---");
   console.log(cfg);
-
+  const builder = getBuilder(cfg);
   console.log("--- list bucket ---");
   const { bucket, prefix, endpoint } = builder.getLocation();
   await listBucket(endpoint, bucket, prefix);
