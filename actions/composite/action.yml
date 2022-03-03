@@ -16,10 +16,12 @@ runs:
   steps:
     - name: Checkout
       uses: actions/checkout@v2
-      path: composite
+      with:
+        path: composite
     - name: Setup Node
       uses: actions/setup-node@v2
     - name: Do stuff
+      shell: bash
       run: |
         pwd
         ls -altr
