@@ -27,7 +27,7 @@ const {
 // TODO: reorganize so these get put into src files
 const getCodeMeta = _.once(async () => {
   const git = simpleGit();
-  const commit = git.revparse(["--short", "HEAD"]);
+  const commit = await git.revparse(["--short", "HEAD"]);
   const curTags = (await git.tag({ "--points-at": "HEAD" })).trim().split("\n");
   console.log(`Found tags that point at HEAD: ${curTags}`);
   return {
@@ -63,16 +63,36 @@ const buildit = async () => {
   };
   console.log("--- Build config ---");
   console.log(cfg);
+
+  console.log("--- list bucket ---");
+  const { bucket, prefix, endpoint } = builder.getLocation();
+  await listBucket(endpoint, bucket, prefix);
+};
+
+const listBucket = async (endpoint, bucket, prefix) => {
+  const ulu = new UpdateListUtil({
+    endpoint,
+    bucket,
+    prefix,
+  });
+  console.time("scan artifacts");
+  const scan = await ulu.scanArtifacts("task-scripts");
+  console.endTime("scan artifacts");
+  console.time("read list");
+  const list = await ulu.readArtifactList("task-scripts");
+  console.endTime("read list");
 };
 
 // --- MAIN METHOD ---
 const publish = async () => {
   console.time("TOTAL");
-  const meta = await core.group("get code meta", getCodeMeta);
+  const meta = await getCodeMeta();
   console.info("CODE META:");
   console.info(meta);
+  await core.group("build it", buildit);
   console.timeEnd("TOTAL");
   core.notice("all done!");
 };
 
+// FIXME: make this run only when main.  (see list updater)
 publish();
