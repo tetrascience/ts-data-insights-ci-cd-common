@@ -1,4 +1,7 @@
 #!/bin/sh
+echo "::group::ENV"
+env
+echo "::endgroup"
 
 echo "::group::Setup Action"
 echo "${INPUT_SSH_KEY}" > /root/.ssh/id_rsa
@@ -16,6 +19,9 @@ cd $GITHUB_WORKSPACE
 
 export AWS_ACCESS_KEY_ID=${INPUT_AWS_ACCESS_KEY_ID}
 export AWS_SECRET_ACCESS_KEY=${INPUT_AWS_SECRET_ACCESS_KEY}
+export ARTIFACT_BUCKET=${INPUT_ARTIFACT_BUCKET}
+export ARTIFACT_BUCKET=${INPUT_ARTIFACT_PREFIX}
+
 
 # FIXME: these should not be hard coded!
 export NAMESPACE='common'

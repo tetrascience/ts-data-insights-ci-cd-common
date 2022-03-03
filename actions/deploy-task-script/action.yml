@@ -9,6 +9,10 @@ inputs:
     required: true
   ssh_key:
     description: "SSH Key for pulling images into the task-script image being published"
+  artifact_bucket:
+    required: true
+  artifact_prefix:
+    required: true
 runs:
   using: "docker"
   image: "Dockerfile"
