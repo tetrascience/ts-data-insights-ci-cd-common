@@ -17,8 +17,11 @@ const {
   SSH_KEY_PATH,
   COMMIT,
   GITHUB_JOB,
+  GITHUB_RUN_ID,
   GITHUB_RUN_NUMBER,
   GITHUB_RUN_ATTEMPT,
+  GITHUB_SHA,
+  GITHUB_REPOSITORY,
 } = process.env;
 
 // FIXME: add tests with jest or something similar?
@@ -31,7 +34,17 @@ const getCodeMeta = _.once(async () => {
   console.log(`Found tags that point at HEAD: ${curTags}`);
   return {
     commit,
-    githubAction: true,
+    githubData: {
+      action: true,
+      job: GITHUB_JOB,
+      run: {
+        id: GITHUB_RUN_ID,
+        number: GITHUB_RUN_NUMBER,
+        attempt: GITHUB_RUN_ATTEMPT,
+      },
+      repository: GITHUB_REPOSITORY,
+      sha: GITHUB_SHA,
+    },
     tags: curTags,
     createdAt: new Date().toISOString(),
   };
