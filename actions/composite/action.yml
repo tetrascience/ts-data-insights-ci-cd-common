@@ -19,7 +19,7 @@ runs:
       with:
         path: composite
         repository: tetrascience/ts-data-insights-ci-cd-common
-        ssh-key: ${{ secrets.ssh_key }}
+        ssh-key: ${{ inputs.ssh_key }}
     - name: Setup Node
       uses: actions/setup-node@v2
     - name: Do stuff
