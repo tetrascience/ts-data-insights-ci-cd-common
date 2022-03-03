@@ -18,6 +18,8 @@ runs:
       uses: actions/checkout@v2
       with:
         path: composite
+        repository: tetrascience/ts-data-insights-ci-cd-common
+        ssh-key: ${{ secrets.ssh_key }}
     - name: Setup Node
       uses: actions/setup-node@v2
     - name: Do stuff
@@ -26,6 +28,8 @@ runs:
         pwd
         ls -altr
         ls -altr composite
+        cd composite
+        yarn install --prod --frozen-lockfile
 
 # -      - run: git config --global url."https://${{ secrets.ALEX_PERSONAL_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
 # -      - name: Install stuff
