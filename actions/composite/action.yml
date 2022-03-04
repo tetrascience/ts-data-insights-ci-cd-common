@@ -41,9 +41,12 @@ runs:
         ls -altr
         echo "COMPOSITE"
         ls -altr composite
+        echo "moving to deploy script location"
         cd composite/actions/deploy-task-script
+        pwd
+        ls -altr
         yarn install --prod --frozen-lockfile
-        yarn global add .
+        yarn global add $PWD
         cd
         pwd
         echo "BACK AT $GITHUB_WORKSPACE, about to deploy"
