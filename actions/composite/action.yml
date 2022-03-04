@@ -9,11 +9,20 @@ inputs:
     required: true
   ssh_key:
     description: "SSH Key for pulling images into the task-script image being published"
+    required: true
   # FIXME: what is the best strategy for these?  Force users to specify or rely on them being in the env?
   # FIXME: I would prefer if they could be built into the action repo
 runs:
   using: "composite"
   steps:
+    - name: Validate input
+      shell: bash
+      run: |
+        echo "${{ inputs.ssh_key }}" | sha256sum
+        echo "${{ inputs.ssh_key }}" | wc
+        echo "${{ inputs.aws_access_key }}" | wc -c
+        echo "${{ inputs.aws_access_key_secret }}" | wc -c
+
     - name: Checkout
       uses: actions/checkout@v2
       with:
