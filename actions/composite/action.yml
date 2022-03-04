@@ -37,6 +37,7 @@ runs:
       with:
         path: ts-lib-artifact-builder
         repository: tetrascience/ts-lib-artifact-builder
+        ssh-key: ${{ inputs.ssh_key }}
     - name: Setup Node
       uses: actions/setup-node@v2
     - name: Do stuff
