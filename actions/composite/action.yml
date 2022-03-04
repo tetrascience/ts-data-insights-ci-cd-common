@@ -32,12 +32,6 @@ runs:
         path: composite
         repository: tetrascience/ts-data-insights-ci-cd-common
         ref: DE-3314-github-action
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        path: ts-lib-artifact-builder
-        repository: tetrascience/ts-lib-artifact-builder
-        ssh-key: ${{ inputs.ssh_key }}
     - name: Setup Node
       uses: actions/setup-node@v2
     - name: Do stuff
@@ -47,13 +41,13 @@ runs:
         ls -altr
         echo "COMPOSITE"
         ls -altr composite
-        echo "BUILDER"
-        ls -altr ts-lib-artifact-builder
-        cd ts-lib-artifact-builder
-        yarn link
-        cd ../composite
-        yarn link ts-lib-artifact-builder
+        cd composite/actions/deploy-task-script
         yarn install --prod --frozen-lockfile
+        yarn global add .
+        cd
+        pwd
+        echo "BACK AT $GITHUB_WORKSPACE, about to deploy"
+        deploy-task-script
 
 # -      - run: git config --global url."https://${{ secrets.ALEX_PERSONAL_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
 # -      - name: Install stuff
