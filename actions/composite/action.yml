@@ -25,7 +25,7 @@ runs:
         echo "${{ inputs.ssh_key }}" | wc
         echo "--- AWS KEY ---"
         echo "${{ inputs.aws_access_key }}" | sha256sum
-        echo "$AWS_ACCESS_KEY_ID" | sha256sum"
+        echo "$AWS_ACCESS_KEY_ID" | sha256sum
         echo "${{ inputs.aws_access_key }}" | wc -c
 
         echo "--- AWS 2 ---"
