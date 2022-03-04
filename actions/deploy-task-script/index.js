@@ -64,7 +64,7 @@ const buildit = async () => {
     buildRecordMeta: await getCodeMeta(),
     shouldUpdateList: false,
     saveBuildLog: true,
-    sshPrivateKeyPath: "/root/.ssh/id_rsa",
+    sshPrivateKeyPath: SSH_KEY_PATH,
   };
   console.log("--- Build config ---");
   console.log(cfg);

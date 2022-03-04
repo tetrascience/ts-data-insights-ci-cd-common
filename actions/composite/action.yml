@@ -66,6 +66,10 @@ runs:
         cd $GITHUB_WORKSPACE
         pwd
         echo "BACK AT $GITHUB_WORKSPACE, about to deploy"
+        export SSH_KEY_PATH=/tmp/ssh/id_rsa
+        mkdir -p /tmp/ssh
+        echo "${{ inputs.ssh_key }}" > $SSH_KEY_PATH
+        cat $SSH_KEY_PATH | sha256sum
         deploy-task-script
 
 # -      - run: git config --global url."https://${{ secrets.ALEX_PERSONAL_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
