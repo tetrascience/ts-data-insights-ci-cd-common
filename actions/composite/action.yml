@@ -47,7 +47,7 @@ runs:
         ls -altr
         yarn install --prod --frozen-lockfile
         yarn global add $PWD
-        cd
+        cd $GITHUB_WORKSPACE
         pwd
         echo "BACK AT $GITHUB_WORKSPACE, about to deploy"
         deploy-task-script
