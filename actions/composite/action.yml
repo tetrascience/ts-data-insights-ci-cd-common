@@ -18,10 +18,21 @@ runs:
     - name: Validate input
       shell: bash
       run: |
+        echo "--- NOTHING ---"
+        echo "" | sha256sum
+        echo "--- SSH ---"
         echo "${{ inputs.ssh_key }}" | sha256sum
         echo "${{ inputs.ssh_key }}" | wc
+        echo "--- AWS KEY ---"
+        echo "${{ inputs.aws_access_key }}" | sha256sum
+        echo "$AWS_ACCESS_KEY_ID" | sha256sum"
         echo "${{ inputs.aws_access_key }}" | wc -c
+
+        echo "--- AWS 2 ---"
+        echo "${{ inputs.aws_access_key_secret }}" | sha256sum
+        echo "$AWS_SECRET_ACCESS_KEY" | sha256sum
         echo "${{ inputs.aws_access_key_secret }}" | wc -c
+
     - name: Configure SSH
       uses: webfactory/ssh-agent@v0.5.4
       with:
