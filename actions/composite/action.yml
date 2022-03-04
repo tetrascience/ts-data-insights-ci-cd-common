@@ -22,20 +22,21 @@ runs:
         echo "${{ inputs.ssh_key }}" | wc
         echo "${{ inputs.aws_access_key }}" | wc -c
         echo "${{ inputs.aws_access_key_secret }}" | wc -c
-
+    - name: Configure SSH
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ inputs.ssh_key }}
     - name: Checkout
       uses: actions/checkout@v2
       with:
         path: composite
         repository: tetrascience/ts-data-insights-ci-cd-common
         ref: DE-3314-github-action
-        ssh-key: ${{ inputs.ssh_key }}
     - name: Checkout
       uses: actions/checkout@v2
       with:
         path: ts-lib-artifact-builder
         repository: tetrascience/ts-lib-artifact-builder
-        ssh-key: ${{ inputs.ssh_key }}
     - name: Setup Node
       uses: actions/setup-node@v2
     - name: Do stuff
@@ -51,7 +52,7 @@ runs:
         yarn link
         cd ../composite
         yarn link ts-lib-artifact-builder
-        yarn install --prod
+        yarn install --prod --frozen-lockfile
 
 # -      - run: git config --global url."https://${{ secrets.ALEX_PERSONAL_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
 # -      - name: Install stuff
