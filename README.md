@@ -12,13 +12,13 @@ name: Code Quality
 on: pull_request
 jobs:
   reusable_workflow:
-    uses: tetrascience/ts-data-insights-ci-cd-common/.github/workflows/python_code_quality@main
+    uses: tetrascience/ts-data-insights-ci-cd-common/.github/workflows/python_code_quality.yml@main
     with:
       python-version: 3.7
-      run_tests: true
+      # run_tests: false
 ```
 
-The `run_tests` input defaults to `false` and is optional for the time being. It will default to true in the future.
+The `run_tests` input defaults to `true` and is optional.
 
 You can also include this as a job within existing workflows if you wish.
 
