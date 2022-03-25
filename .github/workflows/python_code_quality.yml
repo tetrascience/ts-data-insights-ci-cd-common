@@ -96,3 +96,8 @@ jobs:
         run: |
           pip install pytest
           python -m pytest -v
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: codecoverage
+          path: coverage.xml
