@@ -36,8 +36,7 @@ jobs:
         with:
           python-version: ${{ inputs.python-version }}
       - run: |
-          pip install poetry
-          pip install pipenv
+          pip install poetry, pipenv
       # Publish to correct targets
       - name: "Publish"
         env:
