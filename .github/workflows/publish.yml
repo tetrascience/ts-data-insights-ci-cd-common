@@ -28,13 +28,20 @@ jobs:
       # Checkout the task script code
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version }}
+      - run: |
+          pip install poetry
+          pip install pipenv
       # Publish to correct targets
       - name: "Publish"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         # NOTE: update reference here to use a different version of the action
-        uses: tetrascience/ts-deploy-task-script-action@0.3.1
+        uses: tetrascience/ts-deploy-task-script-action@DE-3617-autogen-requirements
         with:
           namespace: ${{ inputs.namespace }}
           slug: ${{ inputs.slug }}
