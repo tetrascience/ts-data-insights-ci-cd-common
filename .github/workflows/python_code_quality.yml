@@ -16,6 +16,10 @@ on:
         required: false
         type: boolean
         default: true
+    secrets:
+      CODACY_PROJECT_TOKEN:
+        required: false
+        type: string
 jobs:
   lint:
     name: Run python linters
