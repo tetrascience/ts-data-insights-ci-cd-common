@@ -16,6 +16,10 @@ on:
         required: false
         type: boolean
         default: true
+    secrets:
+      CODACY_PROJECT_TOKEN:
+        required: false
+
 jobs:
   lint:
     name: Run python linters
@@ -82,23 +86,30 @@ jobs:
         run: |
           pip install pipenv
           pipenv sync --dev
-          pipenv run python -m pytest -v
+          pipenv run pip install pytest-cov
+          pipenv run python -m pytest -v --cov --cov-branch --cov-report xml
       # check for a poetry lockfile (since we can't rely on pyproject.toml indicating a poetry project)
       - name: Test with poetry
         if: hashFiles('poetry.lock') != ''
         run: |
           pip install poetry
           poetry install
-          poetry run python -m pytest -v
+          poetry run pip install pytest-cov
+          poetry run python -m pytest -v --cov --cov-branch --cov-report xml
       # no pipfile or poetry lockfile, so we'll just install pytest with pip and run that
       - name: Test with pip
         if: hashFiles('Pipfile') == '' && hashFiles('poetry.lock') == ''
         run: |
-          pip install pytest
-          python -m pytest -v
+          pip install pytest pytest-cov
+          python -m pytest -v --cov --cov-branch --cov-report xml
 
-      - uses: actions/upload-artifact@v3
+      - name: Run codacy-coverage-reporter
+        uses: codacy/codacy-coverage-reporter-action@v1
+        # Only run if the CODACY_PROJECT_TOKEN is set
+        # Pattern from https://github.community/t/how-can-i-test-if-secrets-are-available-in-an-action/17911/10
+        env:
+          CODACY_CHECK: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        if: env.CODACY_CHECK
         with:
-          name: codecoverage
-          path: coverage.xml
-          if-no-files-found: ignore
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: coverage.xml
