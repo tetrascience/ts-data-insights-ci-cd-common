@@ -101,7 +101,11 @@ jobs:
 
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@v1
-        if: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        # Only run if the CODACY_PROJECT_TOKEN is set
+        # Pattern from https://github.community/t/how-can-i-test-if-secrets-are-available-in-an-action/17911/10
+        env:
+          CODACY_CHECK: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        if: env.CODACY_CHECK
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: coverage.xml
