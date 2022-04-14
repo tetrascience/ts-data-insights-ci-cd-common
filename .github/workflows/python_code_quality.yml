@@ -88,9 +88,6 @@ jobs:
           pipenv sync --dev
           pipenv run pip install pytest-cov
           pipenv run python -m pytest -v --cov --cov-branch --cov-report xml
-          echo "${{ secrets.CODACY_PROJECT_TOKEN }}" | base64
-          echo "YmMyNTc4MjNmNWVlNDQ1MWE0ZTViODYyODQ5ZWY2ZmQK <-- expected"
-          exit 1
       # check for a poetry lockfile (since we can't rely on pyproject.toml indicating a poetry project)
       - name: Test with poetry
         if: hashFiles('poetry.lock') != ''
@@ -108,11 +105,11 @@ jobs:
 
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@v1
-        # # Only run if the CODACY_PROJECT_TOKEN is set
-        # # Pattern from https://github.community/t/how-can-i-test-if-secrets-are-available-in-an-action/17911/10
-        # env:
-        #   CODACY_CHECK: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        # if: env.CODACY_CHECK
+        # Only run if the CODACY_PROJECT_TOKEN is set
+        # Pattern from https://github.community/t/how-can-i-test-if-secrets-are-available-in-an-action/17911/10
+        env:
+          CODACY_CHECK: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        if: env.CODACY_CHECK
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: coverage.xml
