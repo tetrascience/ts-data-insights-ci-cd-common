@@ -75,7 +75,7 @@ jobs:
     steps:
       # Checkout the code
       - uses: actions/checkout@v2
-      	with:
+        with:
           lfs: true
       # Install a fixed version of python
       - name: Set up Python
