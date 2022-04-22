@@ -95,11 +95,13 @@ jobs:
         if: hashFiles('poetry.lock') != ''
         run: |
           pip install poetry
-          poetry config repositories.di-pypi-virtual https://tetrascience.jfrog.io/artifactory/api/pypi/di-pypi-virtual/simple
-          poetry config http-basic.di-pypi-virtual ts-jfrog-artifactory ${{ secrets.ARTIFACTORY_DI_PYPI_PASSWORD }}
+          poetry config repositories.di_pypi_virtual https://tetrascience.jfrog.io/artifactory/api/pypi/di-pypi-virtual/simple
           poetry install
           poetry run pip install pytest-cov
           poetry run python -m pytest -v --cov --cov-branch --cov-report xml
+        env:
+          POETRY_HTTP_BASIC_DI_PYPI_VIRTUAL_USERNAME: ts-jfrog-artifactory
+          POETRY_HTTP_BASIC_DI_PYPI_VIRTUAL_PASSWORD: ${{ secrets.ARTIFACTORY_DI_PYPI_PASSWORD }}
       # no pipfile or poetry lockfile, so we'll just install pytest with pip and run that
       - name: Test with pip
         if: hashFiles('Pipfile') == '' && hashFiles('poetry.lock') == ''
