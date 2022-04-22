@@ -96,7 +96,7 @@ jobs:
         run: |
           pip install poetry
           poetry config repositories.di_pypi_virtual https://tetrascience.jfrog.io/artifactory/di-pypi-virtual/
-          poetry config http-basic.di_pypi_virtual ts-jfrog-artifactory ${{secrets.ARTIFACTORY_DI_PYPI_PASSWORD}} 
+          export POETRY_HTTP_BASIC_ARTIFACTORY_USERNAME=ts-jfrog-artifactory && export POETRY_HTTP_BASIC_ARTIFACTORY_PASSWORD=${{secrets.ARTIFACTORY_DI_PYPI_PASSWORD}} 
           poetry install
           poetry run pip install pytest-cov
           poetry run python -m pytest -v --cov --cov-branch --cov-report xml
