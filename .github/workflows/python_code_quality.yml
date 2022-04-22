@@ -95,7 +95,7 @@ jobs:
         if: hashFiles('poetry.lock') != ''
         run: |
           pip install poetry
-          poetry config repositories.di_pypi_virtual https://tetrascience.jfrog.io/artifactory/di-pypi-virtual/
+          poetry config repositories.artifactory https://tetrascience.jfrog.io/artifactory/di-pypi-virtual/
           export POETRY_HTTP_BASIC_ARTIFACTORY_USERNAME=ts-jfrog-artifactory && export POETRY_HTTP_BASIC_ARTIFACTORY_PASSWORD=${{secrets.ARTIFACTORY_DI_PYPI_PASSWORD}} 
           poetry install
           poetry run pip install pytest-cov
