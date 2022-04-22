@@ -95,7 +95,8 @@ jobs:
         if: hashFiles('poetry.lock') != ''        
         run: |
           pip install poetry
-          poetry config http-basic.artifactory ts-jfrog-artifactory 
+          poetry config http-basic.artifactory ts-jfrog-artifactory test123
+          echo "Runing poetry install"
           poetry install
           poetry run pip install pytest-cov
           poetry run python -m pytest -v --cov --cov-branch --cov-report xml
