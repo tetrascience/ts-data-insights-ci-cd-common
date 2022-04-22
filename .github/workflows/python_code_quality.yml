@@ -96,7 +96,7 @@ jobs:
           ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       # check for a poetry lockfile (since we can't rely on pyproject.toml indicating a poetry project)
       - name: Test with poetry
-        if: hashFiles('poetry.lock') != '' && hashFiles('Pipfile') == ''
+        if: hashFiles('poetry.lock') != ''
         run: |
           pip install poetry
           poetry config http-basic.artifactory ts-jfrog-artifactory "$ARTIFACTORY_PASSWORD"
@@ -109,8 +109,7 @@ jobs:
       - name: Test with pip
         if: hashFiles('Pipfile') == '' && hashFiles('poetry.lock') == ''
         run: |
-          pip install pytest pytest-cov
-          python -m pytest -v --cov --cov-branch --cov-report xml
+          exit "No lock file available"
 
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@v1
