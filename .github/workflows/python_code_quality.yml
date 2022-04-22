@@ -94,7 +94,6 @@ jobs:
           pipenv run python -m pytest -v --cov --cov-branch --cov-report xml
       # check for a poetry lockfile (since we can't rely on pyproject.toml indicating a poetry project)
       - name: Test with poetry
-        shell: bash
         if: hashFiles('poetry.lock') != ''        
         run: |
           pip install poetry
