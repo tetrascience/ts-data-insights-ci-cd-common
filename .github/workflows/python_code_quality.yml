@@ -92,12 +92,14 @@ jobs:
           pipenv run python -m pytest -v --cov --cov-branch --cov-report xml
       # check for a poetry lockfile (since we can't rely on pyproject.toml indicating a poetry project)
       - name: Test with poetry
+        env:
+          ARTIFACTORY_DI_PYPI_PASSWORD: ${{ secrets.ARTIFACTORY_DI_PYPI_PASSWORD }}
         if: hashFiles('poetry.lock') != ''
         run: |
           pip install poetry
           poetry config repositories.artifactory https://tetrascience.jfrog.io/artifactory/di-pypi-virtual/
           export POETRY_HTTP_BASIC_ARTIFACTORY_USERNAME=ts-jfrog-artifactory 
-          export POETRY_HTTP_BASIC_ARTIFACTORY_PASSWORD=${{ secrets.ARTIFACTORY_DI_PYPI_PASSWORD }} 
+          export POETRY_HTTP_BASIC_ARTIFACTORY_PASSWORD="$ARTIFACTORY_DI_PYPI_PASSWORD" 
           poetry install
           poetry run pip install pytest-cov
           poetry run python -m pytest -v --cov --cov-branch --cov-report xml
