@@ -93,16 +93,16 @@ jobs:
       # check for a poetry lockfile (since we can't rely on pyproject.toml indicating a poetry project)
       - name: Test with poetry
         shell: bash
-        env: 
-          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_DI_PYPI_PASSWORD }}
         if: hashFiles('poetry.lock') != ''        
         run: |
           pip install poetry
-          poetry config http-basic.artifactory ts-jfrog-artifactory $ARTIFACTORY_PASSWORD
+          poetry config http-basic.artifactory ts-jfrog-artifactory "${ARTIFACTORY_PASSWORD}"
           echo "Runing poetry install"
           poetry install
           poetry run pip install pytest-cov
           poetry run python -m pytest -v --cov --cov-branch --cov-report xml
+        env: 
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_DI_PYPI_PASSWORD }}  
       # no pipfile or poetry lockfile, so we'll just install pytest with pip and run that
       - name: Test with pip
         if: hashFiles('Pipfile') == '' && hashFiles('poetry.lock') == ''
