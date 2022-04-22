@@ -19,6 +19,8 @@ on:
     secrets:
       CODACY_PROJECT_TOKEN:
         required: false
+      ARTIFACTORY_PASSWORD:
+        required: false
 
 jobs:
   lint:
