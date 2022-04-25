@@ -89,7 +89,7 @@ jobs:
           pip install pipenv
           pipenv sync --dev
           pipenv run pip install pytest-cov
-          pipenv run python -m pytest -v --cov --cov-branch --cov-report xml
+          pipenv run python -m pytest -v --cov src/ --cov-branch --cov-report xml
       # check for a poetry lockfile (since we can't rely on pyproject.toml indicating a poetry project)
       - name: Test with poetry
         if: hashFiles('poetry.lock') != ''
@@ -97,13 +97,13 @@ jobs:
           pip install poetry
           poetry install
           poetry run pip install pytest-cov
-          poetry run python -m pytest -v --cov --cov-branch --cov-report xml
+          poetry run python -m pytest -v --cov src/ --cov-branch --cov-report xml
       # no pipfile or poetry lockfile, so we'll just install pytest with pip and run that
       - name: Test with pip
         if: hashFiles('Pipfile') == '' && hashFiles('poetry.lock') == ''
         run: |
           pip install pytest pytest-cov
-          python -m pytest -v --cov --cov-branch --cov-report xml
+          python -m pytest -v --cov src/ --cov-branch --cov-report xml
 
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@v1
