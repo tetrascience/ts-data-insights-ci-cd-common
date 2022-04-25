@@ -102,7 +102,7 @@ jobs:
           poetry run pip install pytest-cov
           poetry run python -m pytest -v --cov --cov-branch --cov-report xml
         env: 
-          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}  
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_DI_PYPI_PASSWORD }}  
       # no pipfile or poetry lockfile, so we'll just install pytest with pip and run that
       - name: Test with pip
         if: hashFiles('Pipfile') == '' && hashFiles('poetry.lock') == ''
