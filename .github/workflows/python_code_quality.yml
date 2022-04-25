@@ -19,6 +19,8 @@ on:
     secrets:
       CODACY_PROJECT_TOKEN:
         required: false
+      ARTIFACTORY_PASSWORD:
+         required: false              
 
 jobs:
   lint:
@@ -91,7 +93,7 @@ jobs:
           pipenv run pip install pytest-cov
           pipenv run python -m pytest -v --cov --cov-branch --cov-report xml
         env:
-          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_DI_PYPI_PASSWORD }}
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       # check for a poetry lockfile (since we can't rely on pyproject.toml indicating a poetry project)
       - name: Test with poetry
         if: hashFiles('poetry.lock') != ''
@@ -102,7 +104,7 @@ jobs:
           poetry run pip install pytest-cov
           poetry run python -m pytest -v --cov --cov-branch --cov-report xml
         env: 
-          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_DI_PYPI_PASSWORD }}  
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}  
       # no pipfile or poetry lockfile, so we'll just install pytest with pip and run that
       - name: Test with pip
         if: hashFiles('Pipfile') == '' && hashFiles('poetry.lock') == ''
