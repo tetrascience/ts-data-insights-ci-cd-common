@@ -3,6 +3,10 @@ name: Build and Publish Task-script Artifact
 on:
   workflow_call:
     inputs:
+      python-version:
+        required: true
+        type: string
+        default: 3.7
       namespace:
         required: true
         type: string
@@ -28,13 +32,20 @@ jobs:
       # Checkout the task script code
       - name: Checkout
         uses: actions/checkout@v3
+      # Setup Python and Install: Poetry, Pipenv
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version }}
+      - run: |
+          pip install poetry pipenv
       # Publish to correct targets
       - name: "Publish"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         # NOTE: update reference here to use a different version of the action
-        uses: tetrascience/ts-deploy-task-script-action@0.3.1
+        uses: tetrascience/ts-deploy-task-script-action@0.3.2
         with:
           namespace: ${{ inputs.namespace }}
           slug: ${{ inputs.slug }}
