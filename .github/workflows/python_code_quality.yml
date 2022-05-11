@@ -1,5 +1,4 @@
-# This workflow will add 3 jobs:
-# - lint: uses `flake8` to lint the code and add comments if it is a PR
+# This workflow will add 2 jobs:
 # - check-format: checks whether any files would be reformatted by `black`
 # - test: runs `pytest`.  Uses `pipenv`, `poetry`, or `pip` depending on the files present
 
@@ -21,20 +20,6 @@ on:
         required: false
 
 jobs:
-  codacy-analysis-cli:
-    name: Codacy Analysis CLI
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@main
-
-      - name: Run Codacy Analysis CLI
-        uses: codacy/codacy-analysis-cli-action@master
-        with:
-          tool: pylint
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          upload: true
-          max-allowed-issues: 2147483647
   check-format:
     name: Check formatting
     runs-on: ubuntu-latest
