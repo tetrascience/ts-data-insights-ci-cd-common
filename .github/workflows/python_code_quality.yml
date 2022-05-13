@@ -20,6 +20,15 @@ on:
         required: false
 
 jobs:
+  check-context-api:
+    name: Deprecation warnings for ts-sdk-python Context
+    runs-on: ubuntu-latest
+    steps:
+      run: |
+        echo 'ls -la'
+        ls -la
+        echo "PWD: ${PWD}"
+        echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
   check-format:
     name: Check formatting
     runs-on: ubuntu-latest
