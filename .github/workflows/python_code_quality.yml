@@ -24,7 +24,7 @@ jobs:
     name: Deprecation warnings for ts-sdk-python Context
     runs-on: ubuntu-latest
     steps:
-      run: |
+     - run: |
         echo 'ls -la'
         ls -la
         echo "PWD: ${PWD}"
