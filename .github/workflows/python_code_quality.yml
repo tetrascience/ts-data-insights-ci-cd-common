@@ -24,11 +24,7 @@ jobs:
     name: Deprecation warnings for ts-sdk-python Context
     runs-on: ubuntu-latest
     steps:
-     - run: |
-        echo 'ls -la'
-        ls -la
-        echo "PWD: ${PWD}"
-        echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
+      - uses: ./.github/actions/deprecation-checker
   test:
     name: Run pytest
     runs-on: ubuntu-latest
