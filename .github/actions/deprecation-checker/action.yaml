@@ -1,34 +1,36 @@
 name: "Deprecated API Scan"
 description: "Scan for deprecated API calls"
 inputs:
-  python-version: # version of Python to run
+  python-version:
     description: "Python version, in the format MAJOR.MINOR"
     required: true
     default: "3.7"
-  pylint-version: # version of Python to run
-    description: "Python version, in the format MAJOR.MINOR"
-    required: true
-    default: "2.9.4"
-#outputs:
-#  results-file: # id of output
-#  description: "Path to results file"
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v3
-      with:
-        lfs: true
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
         python-version: ${{ inputs.python-version }}
+        cache: "pip"
     - run: |
         pip install --upgrade pip setuptools wheel
-        pip install pylint==${{ github.pylint-version }}
+        pip install -r "${{ github.action_path }}/requirements.txt"
       shell: bash
     - run: |
-        echo 'ls -la'
-        ls -la
-        echo "PWD: ${PWD}"
-        echo "GITHUB_WORKSPACE: ${{ github.workspace }}"
+        python -m find_pylint_targets "${{ github.workspace }}" pylint_targets.txt
+        cat pylint_targets.txt
       shell: bash
+      env:
+        PYTHONPATH: "${{ github.action_path }}"
+    - run: |
+        cat pylint_targets.txt | \
+        xargs pylint \
+          --disable=all \
+          --enable=deprecated-context-api \
+          --load-plugins=deprecation_checker \
+          --score=n \
+          --fail-on=deprecated-context-api
+      shell: bash
+      env:
+        PYTHONPATH: "${{ github.action_path }}"

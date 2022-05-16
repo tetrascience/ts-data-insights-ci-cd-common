@@ -1,0 +1,5 @@
+pylint==2.13
+astroid>=2.0,<3
+pytest>=6.0
+snapshottest~=0.6.0
+black>=22.1.0,<23
