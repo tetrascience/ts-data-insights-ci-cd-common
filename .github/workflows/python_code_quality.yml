@@ -1,5 +1,4 @@
-# This workflow will add 3 jobs:
-# - lint: uses `flake8` to lint the code and add comments if it is a PR
+# This workflow will add 2 jobs:
 # - check-format: checks whether any files would be reformatted by `black`
 # - test: runs `pytest`.  Uses `pipenv`, `poetry`, or `pip` depending on the files present
 
@@ -21,38 +20,6 @@ on:
         required: false
 
 jobs:
-  lint:
-    name: Run python linters
-    runs-on: ubuntu-latest
-    steps:
-      # Checkout the code
-      - name: Checkout Code
-        uses: actions/checkout@v2
-      # Setup the reviewdog app
-      - uses: reviewdog/action-setup@v1
-        with:
-          reviewdog_version: latest # Optional. [latest,nightly,v.X.Y.Z]
-      # Install any linters we will use
-      - name: Install linters
-        run: |
-          pip install flake8 pylint
-      - name: Run linters
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "::group::*** FLAKE8 LINTING ***"
-          flake8 . | reviewdog -reporter="github-pr-review" -f flake8 -name flake8 -level info  -tee
-          echo "::endgroup::"
-          echo "::group::*** PYLINT LINTING ***"
-          # pylint is a little trickier to run.  This command:
-          # - finds all python files (output: './main.py', './src/parse.py')
-          # - prints only the files and directories that are in the current directory with awk (output: 'main.py', 'src')
-          # - removes duplicates with sort -u (unique)
-          find . -name '*py' | awk -F / '{print $2}' | sort -u > files_for_pylint.txt
-          # run these files/dirs through pylint and let reviewdog post comments
-          cat files_for_pylint.txt | xargs pylint | reviewdog -reporter="github-pr-review" -efm="%f:%l:%c: %m" -name pylint -level info --tee
-          echo "::endgroup::"
-
   check-format:
     name: Check formatting
     runs-on: ubuntu-latest
