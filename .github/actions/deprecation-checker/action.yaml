@@ -1,4 +1,4 @@
-name: "Deprecated API Scan"
+name: "Detect Deprecated APIs"
 description: "Scan for deprecated API calls"
 inputs:
   python-version:

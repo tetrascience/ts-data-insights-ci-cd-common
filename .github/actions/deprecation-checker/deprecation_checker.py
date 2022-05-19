@@ -38,7 +38,7 @@ class ContextAPIDeprecationChecker(BaseChecker):
     name = "context-api"
     #: Messages to register with pylint and potentially display.
     msgs = {
-        "W1504": (
+        "W1599": (
             "Deprecated argument 'IDS' passed to Context.write_file()",
             "deprecated-context-api",
             "file_category='IDS' is deprecated and will be removed in the future.",
