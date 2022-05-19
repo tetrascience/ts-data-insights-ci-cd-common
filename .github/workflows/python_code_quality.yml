@@ -41,6 +41,21 @@ jobs:
           path: .github/pylint-plugin
       - uses: ./.github/pylint-plugin/.github/actions/deprecation-checker
         if: hashFiles('main.py') != ''
+  check-format:
+    name: Check formatting
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code
+      - uses: actions/checkout@v2
+      # Install a fixed version of python
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version }}
+      # Check the files with black
+      - run: |
+          pip install black
+          black --check .
   test:
     name: Run pytest
     runs-on: ubuntu-latest
