@@ -10,8 +10,8 @@
         test/raises_error_example.py
 
     ************* Module test.raises_error_example
-    test/raises_error_example.py:1:0: W1504: Deprecated argument 'IDS' passed to Context.write_file() (deprecated-context-api)
-    test/raises_error_example.py:6:4: W1504: Deprecated argument 'IDS' passed to Context.write_file() (deprecated-context-api)
+    test/raises_error_example.py:1:0: W1599: Deprecated argument 'IDS' passed to Context.write_file() (deprecated-context-api)
+    test/raises_error_example.py:6:4: W1599: Deprecated argument 'IDS' passed to Context.write_file() (deprecated-context-api)
 """
 
 from __future__ import annotations
