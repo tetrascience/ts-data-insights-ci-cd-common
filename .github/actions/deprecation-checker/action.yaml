@@ -1,0 +1,36 @@
+name: "Detect Deprecated APIs"
+description: "Scan for deprecated API calls"
+inputs:
+  python-version:
+    description: "Python version, in the format MAJOR.MINOR"
+    required: true
+    default: "3.7"
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: "pip"
+    - run: |
+        pip install --upgrade pip setuptools wheel
+        pip install -r "${{ github.action_path }}/requirements.txt"
+      shell: bash
+    - run: |
+        python -m find_pylint_targets "${{ github.workspace }}" pylint_targets.txt
+        cat pylint_targets.txt
+      shell: bash
+      env:
+        PYTHONPATH: "${{ github.action_path }}"
+    - run: |
+        cat pylint_targets.txt | \
+        xargs pylint \
+          --disable=all \
+          --enable=deprecated-context-api \
+          --load-plugins=deprecation_checker \
+          --score=n \
+          --fail-on=deprecated-context-api
+      shell: bash
+      env:
+        PYTHONPATH: "${{ github.action_path }}"

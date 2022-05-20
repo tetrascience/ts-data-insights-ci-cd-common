@@ -15,11 +15,32 @@ on:
         required: false
         type: boolean
         default: true
+      deprecation_checker_ref:
+        description: "The commit hash, branch name, or tag of the 'deprecation-checker` Github Action to run"
+        required: false
+        type: string
+        default: "main"
     secrets:
       CODACY_PROJECT_TOKEN:
         required: false
 
 jobs:
+  check-context-api:
+    name: Deprecation warnings for ts-sdk-python Context
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+      - name: Checkout custom pylint plugin
+        if: hashFiles('main.py') != ''
+        uses: actions/checkout@v3
+        with:
+          repository: tetrascience/ts-data-insights-ci-cd-common
+          ref: "${{ inputs.deprecation_checker_ref }}"
+          path: .github/pylint-plugin
+      - uses: ./.github/pylint-plugin/.github/actions/deprecation-checker
+        if: hashFiles('main.py') != ''
   check-format:
     name: Check formatting
     runs-on: ubuntu-latest
