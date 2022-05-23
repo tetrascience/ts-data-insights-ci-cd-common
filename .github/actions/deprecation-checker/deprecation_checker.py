@@ -1,4 +1,4 @@
-"""Check for deprecated usages of the :meth:`ts_sdk.task.Context.write_file` method.
+"""Check for deprecated usages, such as of the :meth:`ts_sdk.task.Context.write_file` method.
 
 .. code-block:: console
 
@@ -7,11 +7,12 @@
         --enable=deprecated-context-api \
         --load-plugins=deprecation_checker \
         --score=n \
-        test/raises_error_example.py
+        test/error_examples/context_deprecation.py
 
-    ************* Module test.raises_error_example
-    test/raises_error_example.py:1:0: W1599: Deprecated argument 'IDS' passed to Context.write_file() (deprecated-context-api)
-    test/raises_error_example.py:6:4: W1599: Deprecated argument 'IDS' passed to Context.write_file() (deprecated-context-api)
+
+    ************* Module context_deprecation
+    test/error_examples/context_deprecation.py:1:0: W1599: Deprecated keyword argument file_category='IDS' passed to Context.write_file() (deprecated-context-api)
+    test/error_examples/context_deprecation.py:6:4: W1599: Deprecated keyword argument file_category='IDS' passed to Context.write_file() (deprecated-context-api)
 """
 
 from __future__ import annotations
@@ -39,8 +40,7 @@ class ContextAPIDeprecationChecker(BaseChecker):
     #: Messages to register with pylint and potentially display.
     msgs = {
         "W1599": (
-            # FIXME: Update wording to be more clear here
-            "Deprecated argument 'IDS' passed to Context.write_file()",
+            "Deprecated keyword argument file_category='IDS' passed to Context.write_file()",
             "deprecated-context-api",
             "file_category='IDS' is deprecated and will be removed in the future.",
         ),
