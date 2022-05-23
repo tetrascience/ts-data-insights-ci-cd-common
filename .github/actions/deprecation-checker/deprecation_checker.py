@@ -17,7 +17,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List
 
 from astroid import nodes
 from pylint.checkers import BaseChecker
@@ -74,7 +74,7 @@ class ContextAPIDeprecationChecker(BaseChecker):
 
 class TaskScriptUtilDeprecationChecker(BaseChecker):
     """
-    FIXME: add words
+    This checker looks for deprecated usage of code imported from `task_script_utils`.
     """
 
     # Note: the pylint plugin breaks without setting ``__implements__``.
@@ -96,9 +96,9 @@ class TaskScriptUtilDeprecationChecker(BaseChecker):
             "Use task_script_utils.datetime_parser.utils.parsing.parse_with_formats() instead",
         ),
     }
-    _ts_task_script_util_imports = {}
+    _ts_task_script_util_imports: Dict[str, str] = {}
 
-    def unroll_function(self, func) -> List[str]:
+    def unroll_function(self, func: nodes.NodeNG) -> List[str]:
         """
         Convert a function call into a list of its objects.
 
@@ -136,8 +136,8 @@ class TaskScriptUtilDeprecationChecker(BaseChecker):
         path.reverse()
         return path
 
-    def visit_call(self, node):
-        """Visit function call nodes"""
+    def visit_call(self, node: nodes.Call) -> None:
+        """Process function call nodes"""
 
         if not isinstance(node.func, (nodes.Attribute, nodes.Name)):
             # There are calls which either do not have a name or don't have attributes
@@ -187,7 +187,7 @@ class TaskScriptUtilDeprecationChecker(BaseChecker):
             else:
                 self._ts_task_script_util_imports[module] = module
 
-    def visit_importfrom(self, node):
+    def visit_importfrom(self, node: nodes.ImportFrom) -> None:
         """Process nodes that look like `from X import Y`."""
 
         if "task_script_utils" not in node.modname:

@@ -1,16 +1,15 @@
-import pytest
 import json
 import pathlib
 from io import StringIO
 from textwrap import dedent
 
+import pytest
 from astroid import extract_node, nodes
+from deprecation_checker import TaskScriptUtilDeprecationChecker
 from pylint.lint import Run, pylinter
 from pylint.reporters import JSONReporter
 from pylint.reporters.text import TextReporter
 from pylint.testutils import CheckerTestCase, MessageTest
-
-from deprecation_checker import TaskScriptUtilDeprecationChecker
 
 
 class TestImportOldDatetimeParser(CheckerTestCase):
