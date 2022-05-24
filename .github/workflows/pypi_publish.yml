@@ -34,6 +34,28 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ inputs.python-version }}
+      - name: Validate github actor
+        # Download the Owners file for ts-data-insights-code-owners
+        # Proceed only if Owner file has been downloaded, make sure
+        # GITHUB_ACTOR is listed in the owner file
+        run: |
+          repo_name=`echo $GITHUB_REPO | awk -F "/" '{print $2}'`
+          repo_file="$repo_name.txt"
+          git_repo_owner_file="https://raw.githubusercontent.com/tetrascience/ts-data-insights-code-owners/main/$repo_file"
+          wget $git_repo_owner_file -T 5
+          if [[ $? != 0 ]]; then
+              echo "Failed to download $git_repo_owner_file"
+              exit 1
+          fi
+          if [[ -f $repo_file ]]; then
+            grep_owner=`cat $repo_file | grep GITHUB_ACTOR`
+            if [[ $grep_owner != $GITHUB_ACTOR ]]; then
+              echo "Unauthorized user: $grep_owner"
+              echo "Authorized Users:"
+              echo `cat $repo_file`
+              exit 1
+            fi
+          fi
 
       - name: Validate Package Manger
         # Stop GA if both setup.py and poetry.lock are present
