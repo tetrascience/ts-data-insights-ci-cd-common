@@ -54,6 +54,8 @@ jobs:
               exit 1
           fi
           grep_owner=`cat $repo_file | grep $GITHUB_ACTOR`
+          echo "$?"
+          echo "$grep_owner"
           if [[ $grep_owner != $GITHUB_ACTOR ]]; then
               echo "Unauthorized user: $GITHUB_ACTOR"
               echo "Authorized Users:"
