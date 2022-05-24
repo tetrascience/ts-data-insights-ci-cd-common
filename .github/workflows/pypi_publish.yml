@@ -42,7 +42,7 @@ jobs:
           repo_name=`echo $GITHUB_REPOSITORY | awk -F "/" '{print $2}'`
           repo_file="$repo_name.txt"
           git_repo_owner_file="https://raw.githubusercontent.com/tetrascience/ts-data-insights-code-owners/main/$repo_file"
-          wget $git_repo_owner_file -T 30
+          wget $git_repo_owner_file
           ls -l
           if [[ $? != 0 ]]; then
               echo "Failed to download $git_repo_owner_file"
