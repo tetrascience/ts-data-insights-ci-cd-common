@@ -42,21 +42,18 @@ jobs:
           repo_name=`echo $GITHUB_REPOSITORY | awk -F "/" '{print $2}'`
           repo_file="$repo_name.txt"
           git_repo_owner_file="https://raw.githubusercontent.com/tetrascience/ts-data-insights-code-owners/main/$repo_file"
-          ls -l
-          curl -O $git_repo_owner_file
-          ls -l
+          wget $git_repo_owner_file
+
           if [[ $? != 0 ]]; then
               echo "Failed to download $git_repo_owner_file"
               exit 1
           fi
-          if [[ -f $repo_file ]]; then
-            grep_owner=`cat $repo_file | grep GITHUB_ACTOR`
-            if [[ $grep_owner != $GITHUB_ACTOR ]]; then
-              echo "Unauthorized user: $grep_owner"
+          grep_owner=`cat $repo_file | grep $GITHUB_ACTOR`
+          if [[ $grep_owner != $GITHUB_ACTOR ]]; then
+              echo "Unauthorized user: $GITHUB_ACTOR"
               echo "Authorized Users:"
               echo `cat $repo_file`
               exit 1
-            fi
           fi
 
       - name: Validate Package Manger
