@@ -49,14 +49,19 @@ jobs:
               echo "Failed to download $git_repo_owner_file"
               exit 1
           fi
-          if [[ $? != 0 ]]; then
-              echo "Failed to download $git_repo_owner_file"
-              exit 1
-          fi
-          grep_owner=`cat $repo_file | grep $GITHUB_ACTOR`
-          echo "$?"
-          echo "$grep_owner"
-          if [[ $grep_owner != $GITHUB_ACTOR ]]; then
+          authorized=false
+          while read line; do
+              if [[ $authorized == true ]]; then
+                  break
+              fi
+
+              if [[ $line == $GITHUB_ACTOR ]]; then
+                  echo "$line==$GITHUB_ACTOR"
+                  authorized=true
+              fi
+          done < $repo_file
+
+          if [[ $authorized == false ]]; then
               echo "Unauthorized user: $GITHUB_ACTOR"
               echo "Authorized Users:"
               echo `cat $repo_file`
