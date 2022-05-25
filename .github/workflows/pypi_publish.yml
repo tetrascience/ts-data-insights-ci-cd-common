@@ -33,20 +33,14 @@ jobs:
           echo "Checking if user '$GITHUB_ACTOR' is authorized to release the package."
           repo_name=`echo $GITHUB_REPOSITORY | awk -F "/" '{print $2}'`
           repo_file="$repo_name.txt"
-
           if [[ -f $repo_file ]]; then
             rm -rf $repo_file
           fi
           git_repo_owner_file="https://raw.githubusercontent.com/tetrascience/ts-data-insights-code-owners/main/$repo_file"
           wget $git_repo_owner_file
-
-          matched_actor=`grep -x $GITHUB_ACTOR $repo_file`
-          if [[ $matched_actor != $GITHUB_ACTOR ]]; then
-              echo "Unauthorized user: $GITHUB_ACTOR"
-              echo "Only following users are authorized: "
-              echo `cat $repo_file`
-              exit 1
-          fi
+          echo "Only following users are authorized: "
+          cat $repo_file
+          grep -x $GITHUB_ACTOR $repo_file
           echo "User '$GITHUB_ACTOR' is authorized."
 
       - name: Validate Github Release Version
