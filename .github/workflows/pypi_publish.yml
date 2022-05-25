@@ -3,7 +3,6 @@ name: PyPI Publisher
 on:
   workflow_call:
     inputs:
-      # Python version is required in order to make sure that pytest and black can be run correctly
       python-version:
         required: true
         type: string
@@ -31,6 +30,7 @@ jobs:
         # Proceed only if Owner file has been downloaded, make sure
         # GITHUB_ACTOR is listed in the owner file
         run: |
+          echo "Checking if user `$GITHUB_ACTOR` is authorized to release the package."
           repo_name=`echo $GITHUB_REPOSITORY | awk -F "/" '{print $2}'`
           repo_file="$repo_name.txt"
 
@@ -39,30 +39,12 @@ jobs:
           fi
           git_repo_owner_file="https://raw.githubusercontent.com/tetrascience/ts-data-insights-code-owners/main/$repo_file"
           wget $git_repo_owner_file
-          return_code=$?
-          echo "$return_code"
-          if [[ $return_code != 0 ]]; then
+          if [[ $? != 0 ]]; then
               echo "Failed to download $git_repo_owner_file"
               exit 1
           fi
-          authorized=false
-          while read line; do
-              if [[ $authorized == true ]]; then
-                  break
-              fi
-
-              if [[ $line == $GITHUB_ACTOR ]]; then
-                  echo "$line==$GITHUB_ACTOR"
-                  authorized=true
-              fi
-          done < $repo_file
-
-          if [[ $authorized == false ]]; then
-              echo "Unauthorized user: $GITHUB_ACTOR"
-              echo "Authorized Users:"
-              echo `cat $repo_file`
-              exit 1
-          fi
+          grep -x $GITHUB_ACTOR $repo_file
+          echo "User `$GITHUB_ACTOR` is authorized."
 
       - name: Validate Github Release Version
         # Ensure that github release version has a
