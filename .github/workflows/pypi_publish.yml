@@ -30,7 +30,7 @@ jobs:
         # Proceed only if Owner file has been downloaded, make sure
         # GITHUB_ACTOR is listed in the owner file
         run: |
-          echo "Checking if user `$GITHUB_ACTOR` is authorized to release the package."
+          echo "Checking if user '$GITHUB_ACTOR' is authorized to release the package."
           repo_name=`echo $GITHUB_REPOSITORY | awk -F "/" '{print $2}'`
           repo_file="$repo_name.txt"
 
@@ -44,7 +44,11 @@ jobs:
               exit 1
           fi
           grep -x $GITHUB_ACTOR $repo_file
-          echo "User `$GITHUB_ACTOR` is authorized."
+          if [[ $? != 0 ]]; then
+              echo "User '$GITHUB_ACTOR' is not authorized."
+              exit 1
+          fi
+          echo "User '$GITHUB_ACTOR' is authorized."
 
       - name: Validate Github Release Version
         # Ensure that github release version has a
