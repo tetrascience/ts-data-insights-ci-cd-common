@@ -1,7 +1,3 @@
-# This workflow will add 2 jobs:
-# - check-format: checks whether any files would be reformatted by `black`
-# - test: runs `pytest`.  Uses `pipenv`, `poetry`, or `pip` depending on the files present
-
 name: PyPI Publisher
 
 on:
@@ -30,10 +26,6 @@ jobs:
     steps:
       # Checkout the code
       - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ inputs.python-version }}
       - name: Validate github actor
         # Download the Owners file for ts-data-insights-code-owners
         # Proceed only if Owner file has been downloaded, make sure
@@ -72,9 +64,27 @@ jobs:
               exit 1
           fi
 
-      - name: Validate Package Manger
+      - name: Validate Github Release Version
+        # Ensure that github release version has a
+        # valid version format
+        run: |
+          github_release_version=$(echo $GITHUB_REF_NAME | tr -d 'v')
+          version_regex='^([0-9]+\.){0,2}(\*|[0-9]+)$'
+          if [[ $github_release_version =~ $version_regex ]]; then
+            echo "Release version '$github_release_version' is valid."
+          else
+            echo "Invalid release version: $github_release_version"
+            exit 1
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Validate Package Manager
         # Stop GA if both setup.py and poetry.lock are present
-        # We dont know which one to use
+        # As we don't know which one to use
         run: |
           if [[ -f setup.py && -f poetry.lock ]]; then
             echo "Both setup.py and poetry.lock exists. Only one of them must be present."
@@ -84,32 +94,20 @@ jobs:
       - name: Build Package using Poetry
         if: hashFiles('poetry.lock') != ''
         run: |
-          echo "Building Package"
           python3 -m pip install --upgrade pip setuptools wheel
           python3 -m pip install poetry
           python3 -m poetry build
 
-          echo "\nValidating Build Version"
-          build_version=$(ls dist/*tar.gz | awk -F"-" '{ print $2 }' | awk -F".tar" '{ print $1 }')
-          github_release_version=$(echo $GITHUB_REF_NAME | tr -d 'v')
-          echo "Build Version: ${build_version}"
-          echo "Github Release version: ${github_release_version}"
-          if [[ "$build_version" != "$github_release_version" ]]; then
-            echo "Release Version mismatch. Stopping..."
-            exit 1
-          fi
-
       - name: Build Package using setup.py
         if: hashFiles('setup.py') != ''
         run: |
-          echo "$PWD"
-          ls -l $PWD
-          echo "\nBuilding Package"
           python3 -m pip install --upgrade pip setuptools wheel build
           python3 -m build
 
-
-          echo "\nValidating Build Version"
+      - name: Validate Build Version
+        # Ensure that version of the python package built in
+        # previous step is same as the github release version
+        run: |
           build_version=$(ls dist/*tar.gz | awk -F "-" '{ print $2 }' | awk -F ".tar" '{ print $1 }')
           github_release_version=$(echo $GITHUB_REF_NAME | tr -d 'v')
           echo "Build Version: ${build_version}"
