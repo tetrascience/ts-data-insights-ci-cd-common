@@ -4,6 +4,7 @@ on:
   workflow_call:
     inputs:
       python-version:
+        #python version is required in order to make sure that the package can be built
         required: true
         type: string
     secrets:
