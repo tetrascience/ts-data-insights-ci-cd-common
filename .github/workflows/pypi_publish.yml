@@ -39,10 +39,7 @@ jobs:
           fi
           git_repo_owner_file="https://raw.githubusercontent.com/tetrascience/ts-data-insights-code-owners/main/$repo_file"
           wget $git_repo_owner_file
-          if [[ $? != 0 ]]; then
-              echo "Failed to download $git_repo_owner_file"
-              exit 1
-          fi
+
           matched_actor=`grep -x $GITHUB_ACTOR $repo_file`
           if [[ $matched_actor != $GITHUB_ACTOR ]]; then
               echo "Unauthorized user: $GITHUB_ACTOR"
