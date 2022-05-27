@@ -4,12 +4,11 @@ from io import StringIO
 from textwrap import dedent
 
 from astroid import extract_node
+from deprecation_checker import ContextAPIDeprecationChecker
 from pylint.lint import Run, pylinter
 from pylint.reporters import JSONReporter
 from pylint.reporters.text import TextReporter
 from pylint.testutils import CheckerTestCase, MessageTest
-
-from deprecation_checker import ContextAPIDeprecationChecker
 
 
 class TestUniqueReturnChecker(CheckerTestCase):
@@ -83,7 +82,10 @@ def test_integration(snapshot) -> None:
     Integration test running this pylint plugin against raises_error_example.py.
     """
     # Arrange
-    file_to_lint = pathlib.Path(__file__).parent.joinpath("raises_error_example.py")
+    file_to_lint = pathlib.Path(__file__).parent.joinpath(
+        "error_examples",
+        "context_deprecation.py",
+    )
     # Cache for the pylint results.
     json_reporter = JSONReporter()
     # Act

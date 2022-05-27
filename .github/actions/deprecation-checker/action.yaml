@@ -27,10 +27,10 @@ runs:
         cat pylint_targets.txt | \
         xargs pylint \
           --disable=all \
-          --enable=deprecated-context-api \
+          --enable=deprecated-context-api,deprecated-task-script-util-datetime-parser-use,deprecated-task-script-util-datetime-parser-import \
           --load-plugins=deprecation_checker \
           --score=n \
-          --fail-on=deprecated-context-api
+          --fail-on=deprecated-context-api,deprecated-task-script-util-datetime-parser-use,deprecated-task-script-util-datetime-parser-import
       shell: bash
       env:
         PYTHONPATH: "${{ github.action_path }}"
