@@ -44,7 +44,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         # NOTE: update reference here to use a different version of the action
-        uses: tetrascience/ts-deploy-task-script-action@v0.3.4
+        uses: tetrascience/ts-deploy-task-script-action@DE-3965-handle-windows-task-script
         with:
           namespace: ${{ inputs.namespace }}
           slug: ${{ inputs.slug }}
