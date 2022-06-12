@@ -43,7 +43,7 @@ jobs:
           cd docs
           poetry run sphinx-multiversion source/ _build/
           touch _build/.nojekyll
-          cp source/redirect.html docs/_build/index.html
+          cp source/redirect.html _build/index.html
           ls -l
           ls -l _build
 
