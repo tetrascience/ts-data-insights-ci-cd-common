@@ -41,11 +41,13 @@ jobs:
       - name: Build Docs
         run: |
           cd docs
-          poetry run sphinx-multiversion source/ _build/html
+          poetry run sphinx-multiversion source/ _build/
           touch _build/.nojekyll
+          cp source/redirect.html docs/_build/index.html
           ls -l
           ls -l _build
-          ls -l _build/html
+
+
 
       - name: Publish Docs to gh-pages
         uses: peaceiris/actions-gh-pages@v3.7.3
