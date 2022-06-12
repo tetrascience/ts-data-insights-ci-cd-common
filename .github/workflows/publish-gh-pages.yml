@@ -40,7 +40,8 @@ jobs:
 
       - name: Build Docs
         run: |
-          poetry run sphinx-multiversion docs/source docs/_build/html
+          cd docs
+          poetry run sphinx-multiversion source/ _build/html
           touch docs/_build/.nojekyll
           ls -l
           ls -l docs
