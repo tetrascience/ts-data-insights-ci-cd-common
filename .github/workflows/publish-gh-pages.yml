@@ -42,11 +42,10 @@ jobs:
         run: |
           cd docs
           poetry run sphinx-multiversion source/ _build/html
-          touch docs/_build/.nojekyll
+          touch _build/.nojekyll
           ls -l
-          ls -l docs
-          ls -l docs/_build
-          ls -l docs/_build/html
+          ls -l _build
+          ls -l _build/html
 
       - name: Publish Docs to gh-pages
         uses: peaceiris/actions-gh-pages@v3.7.3
