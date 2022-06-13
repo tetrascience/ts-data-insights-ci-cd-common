@@ -37,9 +37,9 @@ jobs:
         run: |
           git branch -a
           cd docs
-          poetry run sphinx-multiversion source/ _build/
-          touch _build/.nojekyll
-          cp source/redirect.html _build/index.html
+          poetry run sphinx-multiversion source/ build/html
+          touch build/html/.nojekyll
+          cp source/redirect.html _build/html/index.html
           ls -l
           ls -l _build
 
@@ -49,5 +49,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3.7.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/_build
+          publish_dir: docs/_build/html
           keep_files: false
