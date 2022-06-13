@@ -32,14 +32,18 @@ jobs:
           python3 -m pip install poetry
           poetry install
 
-      
+      - name: Checkout gh-pages
+        uses: actions/checkout@v2
+        with:
+          ref: gh-pages
+          path: docs/_build
+
       - name: Build Docs
         run: |
-          git branch -a
           cd docs
-          poetry run sphinx-multiversion source/ build/html
-          touch build/html/.nojekyll
-          cp source/redirect.html _build/html/index.html
+          poetry run sphinx-multiversion source/ _build/
+          touch _build/.nojekyll
+          cp source/redirect.html _build/index.html
           ls -l
           ls -l _build
 
@@ -49,5 +53,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3.7.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/_build/html
+          publish_dir: docs/_build
           keep_files: false
