@@ -32,14 +32,10 @@ jobs:
           python3 -m pip install poetry
           poetry install
 
-      - name: Checkout gh-pages
-        uses: actions/checkout@v2
-        with:
-          ref: gh-pages
-          path: docs/_build
-
+      
       - name: Build Docs
         run: |
+          git branch -a
           cd docs
           poetry run sphinx-multiversion source/ _build/
           touch _build/.nojekyll
