@@ -94,6 +94,7 @@ jobs:
           python -m pytest -v --cov --cov-branch --cov-report xml
 
       - name: Run codacy-coverage-reporter
+        continue-on-error: true
         uses: codacy/codacy-coverage-reporter-action@v1
         # Only run if the CODACY_PROJECT_TOKEN is set
         # Pattern from https://github.community/t/how-can-i-test-if-secrets-are-available-in-an-action/17911/10
