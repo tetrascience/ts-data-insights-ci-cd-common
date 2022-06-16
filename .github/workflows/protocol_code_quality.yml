@@ -1,0 +1,20 @@
+# This workflow will add 2 jobs:
+# - validate_ids: Run the IDS validator on the current directory
+# - check_format: checks whether files are formatted correctly according to `prettier`
+
+name: Protocol Quality Checks
+
+on: workflow_call
+
+jobs:
+  check_format:
+    name: "Check formatting"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+      - name: "Check with prettier"
+        run: |
+          yarn add prettier --dev
+          yarn run prettier --check .
