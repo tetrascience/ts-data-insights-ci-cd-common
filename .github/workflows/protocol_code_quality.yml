@@ -1,5 +1,4 @@
-# This workflow will add 2 jobs:
-# - validate_ids: Run the IDS validator on the current directory
+# This workflow will add 1 job:
 # - check_format: checks whether files are formatted correctly according to `prettier`
 
 name: Protocol Quality Checks

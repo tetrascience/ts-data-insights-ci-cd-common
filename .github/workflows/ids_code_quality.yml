@@ -1,6 +1,6 @@
 # This workflow will add 2 jobs:
 # - validate_ids: Run the IDS validator on the current directory
-# - check_format: checks whether files are formatted correctly according to `prettier`
+# - check_format: checks whether files are formatted correctly according to `prettier` and `black`
 
 name: IDS Quality Checks
 
