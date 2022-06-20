@@ -1,0 +1,39 @@
+# This workflow will add 2 jobs:
+# - validate_ids: Run the IDS validator on the current directory
+# - check_format: checks whether files are formatted correctly according to `prettier` and `black`
+
+name: IDS Quality Checks
+
+on: workflow_call
+
+jobs:
+  validate_ids:
+    name: "Validate IDS"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: "Set up Python"
+        uses: actions/setup-python@v2
+      - name: "Run IDS validator"
+        run: |
+          pip install ts-ids-validator
+          python -m ids_validator --ids_dir .
+  check_format:
+    name: "Check formatting"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+      - name: "Check with prettier"
+        run: |
+          yarn add prettier --dev
+          yarn run prettier --check .
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        if: hashFiles('poetry.lock') != '' || hashFiles('Pipfile') != ''
+      - name: "Check with black"
+        if: hashFiles('poetry.lock') != '' || hashFiles('Pipfile') != ''
+        run: |
+          pip install black
+          black --check .

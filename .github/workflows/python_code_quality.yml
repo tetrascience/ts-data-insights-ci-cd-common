@@ -1,4 +1,5 @@
-# This workflow will add 2 jobs:
+# This workflow will add 3 jobs:
+# - check-context-api: checks for deprecated code
 # - check-format: checks whether any files would be reformatted by `black`
 # - test: runs `pytest`.  Uses `pipenv`, `poetry`, or `pip` depending on the files present
 
