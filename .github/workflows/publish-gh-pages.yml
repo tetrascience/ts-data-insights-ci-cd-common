@@ -12,18 +12,16 @@ jobs:
   publish-docs:
     name: "Publish Github Pages"
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
       # Checkout the code
       - name: Checkout Source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           # require all of history to see all tagged versions' docs
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ inputs.python-version }}
 
@@ -33,7 +31,7 @@ jobs:
           poetry install
 
       - name: Checkout gh-pages
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: gh-pages
           path: docs/_build
@@ -44,6 +42,7 @@ jobs:
           poetry run sphinx-multiversion source/ _build/
           touch _build/.nojekyll
           cp source/redirect.html _build/index.html
+          echo "Listing top-level build files:"
           ls -l _build
 
       - name: Publish Docs to gh-pages
