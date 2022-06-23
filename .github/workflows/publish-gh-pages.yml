@@ -1,0 +1,53 @@
+name: Publish Github Pages
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        #python version is required in setup the python environment
+        required: true
+        type: string
+
+jobs:
+  publish-docs:
+    name: "Publish Github Pages"
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code
+      - name: Checkout Source
+        uses: actions/checkout@v3
+        with:
+          # require all of history to see all tagged versions' docs
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install Dependencies
+        run: |
+          python3 -m pip install poetry
+          poetry install
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+          path: docs/_build
+
+      - name: Build Docs
+        run: |
+          cd docs
+          poetry run sphinx-multiversion source/ _build/
+          touch _build/.nojekyll
+          cp source/redirect.html _build/index.html
+          echo "Listing top-level build files:"
+          ls -l _build
+
+      - name: Publish Docs to gh-pages
+        uses: peaceiris/actions-gh-pages@v3.7.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build
+          keep_files: false
