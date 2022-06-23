@@ -49,7 +49,9 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         # NOTE: update reference here to use a different version of the action
-        uses: tetrascience/ts-deploy-task-script-action@v0.4.0
+        # FIXME: revert this to the correct tag
+        uses: tetrascience/ts-deploy-task-script-action@DE-4097-update-to-support-ids-and-protocol
+        # uses: tetrascience/ts-deploy-task-script-action@v0.4.0
         with:
           type: ${{ inputs.type }}
           namespace: ${{ inputs.namespace }}
