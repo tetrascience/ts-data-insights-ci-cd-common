@@ -12,6 +12,11 @@ on:
       slug:
         required: true
         type: string
+      tag_validator_ref:
+        description: "The commit hash, branch name, or tag of the 'deprecation-checker` Github Action to run"
+        required: false
+        type: string
+        default: "main"
     secrets:
       AWS_ACCESS_KEY_ID:
         required: false
