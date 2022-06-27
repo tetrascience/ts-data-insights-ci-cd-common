@@ -18,8 +18,6 @@ runs:
         pip install -r "${{ github.action_path }}/requirements.txt"
       shell: bash
     - run: |
-        printenv
-        ls -l
         python -m validate_tag
       shell: bash
       env:
