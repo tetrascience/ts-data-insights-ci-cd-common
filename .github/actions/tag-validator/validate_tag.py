@@ -31,3 +31,7 @@ class Tag:
                 f"Tag: {str(self.tag)} is reserved for pull request."
                 "Major and minor version can not be zero."
             )
+
+
+if __name__ == "__main__":
+    print("Validate tag here")
