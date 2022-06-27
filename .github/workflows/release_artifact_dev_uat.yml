@@ -14,12 +14,12 @@ on:
         type: string
     secrets:
       AWS_ACCESS_KEY_ID:
-        required: true
+        required: false
       AWS_SECRET_ACCESS_KEY:
-        required: true
+        required: false
       ssh_key:
         description: An SSH key with access to the Tetrascience Org
-        required: true
+        required: false
 
 jobs:
   validate-tag-or-release:
