@@ -25,9 +25,10 @@ class Tag:
                 raise ValueError(f"Tag {self.tag} already exist.")
 
     def validate_tag_is_not_reserved_for_pull_request(self):
+        tag = semver.VersionInfo.parse(self.tag)
         if (
-            self.tag.major == 0
-            and self.tag.minor == 0
+            tag.major == 0
+            and tag.minor == 0
         ):
             raise ValueError(
                 f"Tag: {str(self.tag)} is reserved for pull request."
