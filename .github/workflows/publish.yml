@@ -1,17 +1,22 @@
-name: Build and Publish Task-script Artifact
+name: Build and Publish Artifact
 
 on:
   workflow_call:
     inputs:
       python-version:
         type: string
-        default: 3.7
+        default: "3.7"
       namespace:
         required: true
         type: string
       slug:
         required: true
         type: string
+      type:
+        required: true
+        type: string
+        # For backwards compatibility
+        default: "task-script"
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -23,12 +28,12 @@ on:
 
 jobs:
   publish:
-    name: "Build and Publish Task Script"
+    name: "Build and Publish Artifact"
     runs-on: ubuntu-latest
     # Only run this job if it is either a pull request or if it is a tag that was pushed
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/'))
     steps:
-      # Checkout the task script code
+      # Checkout the code
       - name: Checkout
         uses: actions/checkout@v3
       # Setup Python and Install: Poetry, Pipenv
@@ -44,8 +49,9 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         # NOTE: update reference here to use a different version of the action
-        uses: tetrascience/ts-deploy-task-script-action@v0.3.5
+        uses: tetrascience/ts-deploy-task-script-action@v0.4.0
         with:
+          type: ${{ inputs.type }}
           namespace: ${{ inputs.namespace }}
           slug: ${{ inputs.slug }}
           ssh_key: ${{ secrets.ssh_key }}
