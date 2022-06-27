@@ -21,7 +21,7 @@ class Tag:
         existing_tags = sh.git("tag")
         if existing_tags:
             existing_tags = existing_tags.split("\n")
-            if self.tag in existing_tags:
+            if f"v{self.tag}" in existing_tags:
                 raise ValueError(f"Tag {self.tag} already exist.")
 
     def validate_tag_is_not_reserved_for_pull_request(self):
