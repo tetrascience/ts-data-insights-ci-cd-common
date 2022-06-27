@@ -21,5 +21,6 @@ runs:
         printenv
         ls -l
         python -m validate_tag.py
+      shell: bash
       env:
         PYTHONPATH: "${{ github.action_path }}"
