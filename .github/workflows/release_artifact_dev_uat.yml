@@ -37,6 +37,6 @@ jobs:
       - name: "LS all"
         run: |
           ls -l .github
-          ls -l .git/tag-validator
+          ls -l .github/tag-validator
           ls -l ./.github/tag-validator/.github/actions/tag-validator
       - uses: ./.github/tag-validator/.github/actions/tag-validator
