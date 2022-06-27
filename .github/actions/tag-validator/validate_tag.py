@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 import sh
@@ -14,6 +15,7 @@ class Tag:
     def validate(self):
         self.validate_tag_is_new()
         self.validate_tag_is_not_reserved_for_pull_request()
+        print(f"Tag validation complete for {self.tag}")
 
     def validate_tag_is_new(self):
         existing_tags = sh.git("tag")
@@ -34,4 +36,7 @@ class Tag:
 
 
 if __name__ == "__main__":
-    print("Validate tag here")
+    gh_tag = os.environ["GITHUB_REF_NAME"]
+    tag = Tag(gh_tag)
+    tag.validate()
+
