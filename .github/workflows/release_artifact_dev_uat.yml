@@ -12,9 +12,6 @@ on:
       slug:
         required: true
         type: string
-      type:
-        required: true
-        type: string
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
