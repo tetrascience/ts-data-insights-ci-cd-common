@@ -23,7 +23,7 @@ class TagVersionValidator:
         self.validate_tag_is_not_reserved_for_pull_request()
         self.validate_tag_in_artifact_files()
 
-        logger.info(f"Tag validation completed sucessfully for {self.tag}")
+        logger.info(f"Tag validation completed successfully for {self.tag}")
 
     def validate_tag_is_new(self):
         existing_tags = sh.git("tag")
