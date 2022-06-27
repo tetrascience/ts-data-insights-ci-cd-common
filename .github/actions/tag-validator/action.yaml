@@ -1,0 +1,25 @@
+name: "Validate Tag"
+description: "Validate Tag"
+inputs:
+  python-version:
+    description: "Python version, in the format MAJOR.MINOR"
+    required: true
+    default: "3.7"
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: "pip"
+    - run: |
+        pip install --upgrade pip setuptools wheel
+        pip install -r "${{ github.action_path }}/requirements.txt"
+      shell: bash
+    - run: |
+        printenv
+        ls -l
+      shell: bash
+      env:
+        PYTHONPATH: "${{ github.action_path }}"

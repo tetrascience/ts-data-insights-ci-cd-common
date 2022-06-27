@@ -1,0 +1,37 @@
+name: Build and Publish Artifact Tag or Release
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        type: string
+        default: 3.7
+      namespace:
+        required: true
+        type: string
+      slug:
+        required: true
+        type: string
+      type:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      ssh_key:
+        description: An SSH key with access to the Tetrascience Org
+        required: true
+
+jobs:
+  validate-tag-or-release:
+    name: Validate Tag or Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Tag
+        uses: actions/checkout@v3
+        with:
+          repository: tetrascience/ts-data-insights-ci-cd-common
+          path: .github/tag-validator
+      - uses: ./.github/tag-validator/.github/actions/tag-validator
