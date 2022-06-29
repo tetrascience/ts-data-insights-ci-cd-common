@@ -13,7 +13,7 @@ on:
         required: true
         type: string
       type:
-        required: true
+        required: false
         type: string
         # For backwards compatibility
         default: "task-script"
