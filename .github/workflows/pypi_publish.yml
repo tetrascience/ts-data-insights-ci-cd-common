@@ -1,0 +1,105 @@
+name: PyPI Publisher
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        #python version is required in order to make sure that the package can be built
+        required: true
+        type: string
+    secrets:
+      PYPI_TEST_TOKEN:
+        required: false
+      PYPI_PROD_TOKEN:
+        required: false
+      ARTIFACTORY_USER:
+        required: false
+      ARTIFACTORY_PASSWORD:
+        required: false
+      ARTIFACTORY_URL:
+        required: false
+
+jobs:
+  pypi-publish:
+    name: PyPI Publish
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code
+      - uses: actions/checkout@v2
+      - name: Validate github actor
+        # Download the Owners file for ts-data-insights-code-owners
+        # Proceed only if Owner file has been downloaded, make sure
+        # GITHUB_ACTOR is listed in the owner file
+        run: |
+          echo "Checking if user '$GITHUB_ACTOR' is authorized to release the package."
+          repo_name=`echo $GITHUB_REPOSITORY | awk -F "/" '{print $2}'`
+          repo_file="$repo_name.txt"
+          if [[ -f $repo_file ]]; then
+            rm -rf $repo_file
+          fi
+          git_repo_owner_file="https://raw.githubusercontent.com/tetrascience/ts-data-insights-code-owners/main/$repo_file"
+          wget $git_repo_owner_file
+          echo "Only following users are authorized: "
+          cat $repo_file
+          grep -x $GITHUB_ACTOR $repo_file
+          echo "User '$GITHUB_ACTOR' is authorized."
+
+      - name: Validate Github Release Version
+        # Ensure that github release version has a
+        # valid version format
+        run: |
+          github_release_version=$(echo $GITHUB_REF_NAME | tr -d 'v')
+          version_regex='^([0-9]+\.){0,2}(\*|[0-9]+)$'
+          if [[ $github_release_version =~ $version_regex ]]; then
+            echo "Release version '$github_release_version' is valid."
+          else
+            echo "Invalid release version: $github_release_version"
+            exit 1
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Validate Package Manager
+        # Stop GA if both setup.py and poetry.lock are present
+        # As we don't know which one to use
+        run: |
+          if [[ -f setup.py && -f poetry.lock ]]; then
+            echo "Both setup.py and poetry.lock exists. Only one of them must be present."
+            exit 1
+          fi
+
+      - name: Build Package using Poetry
+        if: hashFiles('poetry.lock') != ''
+        run: |
+          python3 -m pip install --upgrade pip setuptools wheel
+          python3 -m pip install poetry
+          python3 -m poetry build
+
+      - name: Build Package using setup.py
+        if: hashFiles('setup.py') != ''
+        run: |
+          python3 -m pip install --upgrade pip setuptools wheel build
+          python3 -m build
+
+      - name: Validate Build Version
+        # Ensure that version of the python package built in
+        # previous step is same as the github release version
+        run: |
+          build_version=$(ls dist/*tar.gz | awk -F "-" '{ print $2 }' | awk -F ".tar" '{ print $1 }')
+          github_release_version=$(echo $GITHUB_REF_NAME | tr -d 'v')
+          echo "Build Version: ${build_version}"
+          echo "Github Release version: ${github_release_version}"
+          if [[ "$build_version" != "$github_release_version" ]]; then
+            echo "Release Version mismatch. Stopping..."
+            exit 1
+          fi
+
+      - name: Publish package to test pypi
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TEST_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
