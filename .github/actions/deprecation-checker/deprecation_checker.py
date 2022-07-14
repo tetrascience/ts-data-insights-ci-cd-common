@@ -159,8 +159,7 @@ class TaskScriptUtilDeprecationChecker(BaseChecker):
         full_path = ".".join(path)
 
         if full_path in (
-            "task_script_utils.datetime_parser.parser.parse",
-            "task_script_utils.datetime_parser.parse",
+            "task_script_utils.convert_datetime_to_ts_format.convert_datetime_to_ts_format",
         ):
             # the call path for this function is a deprecated function
             self.add_message(
@@ -173,8 +172,7 @@ class TaskScriptUtilDeprecationChecker(BaseChecker):
             if "task_script_utils" not in module:
                 continue
             if module in (
-                "task_script_utils.datetime_parser.parser",
-                "task_script_utils.datetime_parser.parse",
+                "task_script_utils.convert_datetime_to_ts_format",
             ):
                 # Direct import of deprecated function or module
                 self.add_message(
@@ -194,7 +192,7 @@ class TaskScriptUtilDeprecationChecker(BaseChecker):
             return
 
         for name, alias in node.names:
-            if name in ("parse", "parser"):
+            if name  == "convert_datetime_to_ts_format":
                 # direct import of deprecated function
                 self.add_message(
                     "deprecated-task-script-util-datetime-parser-import", node=node
