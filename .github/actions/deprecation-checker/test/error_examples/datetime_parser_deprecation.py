@@ -1,10 +1,9 @@
 """
 These imports should each trigger a pylint error
 """
-import task_script_utils.datetime_parser.parser
-from task_script_utils.datetime_parser.parser import parse
-from task_script_utils.datetime_parser.parser import parse as p_0
-from task_script_utils.datetime_parser import parse as p_1
+import task_script_utils.convert_datetime_to_ts_format
+from task_script_utils.convert_datetime_to_ts_format import convert_datetime_to_ts_format
+from task_script_utils.convert_datetime_to_ts_format import convert_datetime_to_ts_format as p_0
 
 
 """
@@ -19,9 +18,8 @@ args = ("2020-01-01", ())
 """
 These calls should trigger a pylint error
 """
-parse(*args)
+convert_datetime_to_ts_format(*args)
 p_0(*args)
-p_1(*args)
 
 dtp_0.parse(*args)
 dtp_0.parser.parse(*args)

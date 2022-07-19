@@ -10,8 +10,8 @@ snapshots = Snapshot()
 snapshots['test_integration 1'] = [
     {
         'column': 0,
-        'endColumn': None,
-        'endLine': None,
+        'endColumn': 39,
+        'endLine': 1,
         'line': 1,
         'message': "Deprecated keyword argument file_category='IDS' passed to Context.write_file()",
         'message-id': 'W1599',
@@ -22,8 +22,8 @@ snapshots['test_integration 1'] = [
     },
     {
         'column': 4,
-        'endColumn': None,
-        'endLine': None,
+        'endColumn': 48,
+        'endLine': 6,
         'line': 6,
         'message': "Deprecated keyword argument file_category='IDS' passed to Context.write_file()",
         'message-id': 'W1599',

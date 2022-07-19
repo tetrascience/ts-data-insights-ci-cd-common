@@ -1,14 +1,11 @@
-import json
 import pathlib
-from io import StringIO
 from textwrap import dedent
 
 import pytest
 from astroid import extract_node, nodes
 from deprecation_checker import TaskScriptUtilDeprecationChecker
-from pylint.lint import Run, pylinter
+from pylint.lint import Run
 from pylint.reporters import JSONReporter
-from pylint.reporters.text import TextReporter
 from pylint.testutils import CheckerTestCase, MessageTest
 
 
@@ -143,7 +140,7 @@ class TestImportOldDatetimeParser(CheckerTestCase):
         """Test that using from task_script_utils.child_module import [...] as alias is correctly tracked"""
         # Arrange
         node = extract_node(
-            "from task_script_utils.datetime_parser import parser as dt_parser"
+            "from task_script_utils.foo import bar as baz"
         )
 
         # Act
@@ -151,7 +148,7 @@ class TestImportOldDatetimeParser(CheckerTestCase):
 
         # Assert
         assert self.checker._ts_task_script_util_imports == {
-            "dt_parser": "task_script_utils.datetime_parser.parser"
+            "baz": "task_script_utils.foo.bar"
         }
 
     def test_deprecated_call(self):
@@ -160,9 +157,9 @@ class TestImportOldDatetimeParser(CheckerTestCase):
         import_node, call_node = extract_node(
             dedent(
                 """
-                import task_script_utils.datetime_parser as dtp #@
+                import task_script_utils #@
 
-                dtp.parse('something') #@
+                task_script_utils.convert_datetime_to_ts_format.convert_datetime_to_ts_format('something') #@
                 """
             )
         )
@@ -188,9 +185,9 @@ class TestImportOldDatetimeParser(CheckerTestCase):
         import_node, call_node = extract_node(
             dedent(
                 """
-                from task_script_utils.datetime_parser import parse #@
+                from task_script_utils.convert_datetime_to_ts_format import convert_datetime_to_ts_format #@
 
-                parse('something') #@
+                convert_datetime_to_ts_format('something') #@
                 """
             )
         )
@@ -240,11 +237,10 @@ class TestImportOldDatetimeParser(CheckerTestCase):
     @pytest.mark.parametrize(
         "failing_import",
         [
-            "import task_script_utils.datetime_parser.parse",
-            "import task_script_utils.datetime_parser.parse as alias",
-            "import task_script_utils.datetime_parser.parser",
-            "import task_script_utils.datetime_parser.parser as alias",
-            "import os, task_script_utils.datetime_parser.parser",
+            "import task_script_utils.convert_datetime_to_ts_format",
+            "import task_script_utils.convert_datetime_to_ts_format as alias",
+            "import os, task_script_utils.convert_datetime_to_ts_format",
+            "import os, task_script_utils.convert_datetime_to_ts_format as alias",
         ],
     )
     def test_import_module_directly(self, failing_import):
