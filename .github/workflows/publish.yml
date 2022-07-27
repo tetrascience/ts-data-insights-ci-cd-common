@@ -92,7 +92,6 @@ jobs:
       startsWith(github.event.ref, 'refs/tags/') &&
       contains(fromJson('["DEV/UAT", "PROD"]'), inputs.env) &&
       startsWith(inputs.tag, 'v')
-
     steps:
       # Checkout the code
       - name: Checkout

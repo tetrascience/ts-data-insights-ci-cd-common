@@ -12,20 +12,13 @@ on:
         default: ''
 
 jobs:
-  protocol-check-format:
-    name: "Protocol: Check formatting"
+  protocol-tests:
+    name: "Protocol tests"
     if: inputs.artifact-type == 'protocol'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ inputs.ref }}
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-      - name: "Check with prettier"
-        run: |
-          yarn add prettier --dev
-          yarn run prettier --check .
+        - run: |
+          echo "No Tests needed for protocol"
 
   ids-run-schema-validation:
     name: "IDS: Validate IDS"
@@ -41,66 +34,6 @@ jobs:
         run: |
           pip install ts-ids-validator
           python -m ids_validator --ids_dir .
-
-  ids-check-format:
-    name: "IDS: Check formatting"
-    if: inputs.artifact-type == 'ids'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ inputs.ref }}
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-      - name: "Check with prettier"
-        run: |
-          yarn add prettier --dev
-          yarn run prettier --check .
-      - name: Setup Python
-        uses: actions/setup-python@v3
-        if: hashFiles('poetry.lock') != '' || hashFiles('Pipfile') != ''
-      - name: "Check with black"
-        if: hashFiles('poetry.lock') != '' || hashFiles('Pipfile') != ''
-        run: |
-          pip install black
-          black --check .
-
-  task-script-check-context-api:
-    name: "Task-Script: Deprecation warnings for ts-sdk-python Context"
-    if: inputs.artifact-type == 'task-script'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          lfs: true
-          ref: ${{ inputs.ref }}
-      - name: Checkout custom pylint plugin
-        if: hashFiles('main.py') != ''
-        uses: actions/checkout@v3
-        with:
-          repository: tetrascience/ts-data-insights-ci-cd-common
-          ref: "${{ inputs.deprecation_checker_ref }}"
-          path: .github/pylint-plugin
-      - uses: ./.github/pylint-plugin/.github/actions/deprecation-checker
-        if: hashFiles('main.py') != ''
-
-  task-script-check-format:
-    name: "Task-Script: Check formatting"
-    if: inputs.artifact-type == 'task-script'
-    runs-on: ubuntu-latest
-    steps:
-      # Checkout the code
-      - uses: actions/checkout@v2
-      # Install a fixed version of python
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ inputs.python-version }}
-          ref: ${{ inputs.ref }}
-      # Check the files with black
-      - run: |
-          pip install black
-          black --check .
 
   task-script-test:
     name: "Task-Script: Run pytest"
