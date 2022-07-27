@@ -64,14 +64,33 @@ jobs:
           slug: ${{ inputs.slug }}
           ssh_key: ${{ secrets.ssh_key }}
 
-  log-workflow-inputs:
+  validate-workflow-inputs:
     name: "Validate env, tag and ref for artifact deployment"
     runs-on: ubuntu-latest
     if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/'))
     steps:
-      - run: echo "${{ toJSON(inputs) }}"
+      - run: |
+          echo "Inputs:"
+          echo "${{ toJSON(inputs) }}"
+
+          if [[ 'DEV/UAT' == ${{ inputs.env }} || 'PROD' = ${{ inputs.env }} ]]; then
+            echo "Artifact will be deployed to ${{ inputs.env }} environment"
+          else
+            echo "Invalid Environment: ${{ inputs.env }}"
+            echo "'inputs.env' must either be set to 'DEV/UAT' or 'PROD'"
+            exit 1
+          fi
+
+          if [[ ${{ inputs.tag }} == v* ]]; then
+            echo "Tag: ${{ inputs.tag }} will be deployed"
+          else
+            echo "'inputs.tag' must start with v"
+            echo "vX.Y.Z and vX.Y.Z.build are accepted formats"
+            exit 1
+
 
   deploy-artifact:
+    needs: validate-workflow-inputs
     name: "Deploy Tag:${{ inputs.tag }} to ${{ inputs.env }}"
     environment: ${{ inputs.env }}
     runs-on: ubuntu-latest
