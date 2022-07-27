@@ -17,6 +17,14 @@ on:
         type: string
         # For backwards compatibility
         default: "task-script"
+      tag:
+        type: string
+        required: false
+        default: ""
+      env:
+        type: string
+        required: false
+        default: ""
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -27,11 +35,11 @@ on:
         required: true
 
 jobs:
-  publish:
-    name: "Build and Publish Artifact"
+  publish-pull-request:
+    name: "Build and Publish Artifact for the Pull Request"
     runs-on: ubuntu-latest
     # Only run this job if it is either a pull request or if it is a tag that was pushed
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/'))
+    if: github.event_name == 'pull_request'
     steps:
       # Checkout the code
       - name: Checkout
@@ -50,6 +58,50 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         # NOTE: update reference here to use a different version of the action
         uses: tetrascience/ts-deploy-task-script-action@v0.4.0
+        with:
+          type: ${{ inputs.type }}
+          namespace: ${{ inputs.namespace }}
+          slug: ${{ inputs.slug }}
+          ssh_key: ${{ secrets.ssh_key }}
+
+  log-workflow-inputs:
+    name: "Validate env, tag and ref for artifact deployment"
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/'))
+    steps:
+      - name: Log Workflow Inputs
+      - run: echo "${{ toJSON(inputs) }}"
+
+  deploy-artifact:
+    needs: validate-inputs-for-tag-deployment
+    name: "Deploy Tag:${{ inputs.tag }} to ${{ inputs.env }}"
+    environment: ${{ inputs.env }}
+    runs-on: ubuntu-latest
+    # Only run this job if it is either a pull request or if it is a tag that was pushed
+    if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/') && contains(['DEV/UAT', 'PROD'], inputs.env && startsWith(inputs.tag, 'v')))
+    steps:
+      # Checkout the code
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.tag }}
+
+      # Setup Python and Install: Poetry, Pipenv
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version || '3.7' }}
+      - run: |
+          pip install poetry pipenv
+
+      # Publish to correct targets
+      - name: "Build and Deploy to ${{ inputs.env }}"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+        # NOTE: update reference here to use a different version of the action
+        uses: tetrascience/ts-deploy-task-script-action@main
         with:
           type: ${{ inputs.type }}
           namespace: ${{ inputs.namespace }}
