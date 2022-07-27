@@ -81,13 +81,6 @@ jobs:
             exit 1
           fi
 
-          if [[ ${{ inputs.tag }} == v* ]]; then
-            echo "Tag: ${{ inputs.tag }} will be deployed"
-          else
-            echo "'inputs.tag' must start with v"
-            echo "vX.Y.Z and vX.Y.Z.build are accepted formats"
-            exit 1
-
 
   deploy-artifact:
     needs: validate-workflow-inputs
