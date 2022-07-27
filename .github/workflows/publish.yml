@@ -84,6 +84,7 @@ jobs:
 
   deploy-artifact:
     needs: validate-workflow-inputs
+    if: needs.validate-workflow-input.result == 'success'
     name: "Deploy Tag:${{ inputs.tag }} to ${{ inputs.env }}"
     environment: ${{ inputs.env }}
     runs-on: ubuntu-latest
@@ -91,7 +92,7 @@ jobs:
     if: |
       github.event_name == 'push' &&
       startsWith(github.event.ref, 'refs/tags/') &&
-      contains(fromJson('["DEV/UAT", "PROD", "PRODUCTION"]'), inputs.env) &&
+      contains(fromJson('["DEV/UAT", "PROD"]'), inputs.env) &&
       startsWith(inputs.tag, 'v')
 
     steps:
