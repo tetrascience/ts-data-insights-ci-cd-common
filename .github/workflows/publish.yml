@@ -72,7 +72,6 @@ jobs:
       - run: echo "${{ toJSON(inputs) }}"
 
   deploy-artifact:
-    needs: validate-inputs-for-tag-deployment
     name: "Deploy Tag:${{ inputs.tag }} to ${{ inputs.env }}"
     environment: ${{ inputs.env }}
     runs-on: ubuntu-latest
