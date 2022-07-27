@@ -17,7 +17,7 @@ jobs:
     if: inputs.artifact-type == 'protocol'
     runs-on: ubuntu-latest
     steps:
-        - run: |
+      - run: |
           echo "No Tests needed for protocol"
 
   ids-run-schema-validation:
