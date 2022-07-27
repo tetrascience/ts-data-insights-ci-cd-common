@@ -1,0 +1,73 @@
+name: Deploy Artifact:Tag to Environments
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        type: string
+        default: "3.7"
+      namespace:
+        required: true
+        type: string
+      slug:
+        required: true
+        type: string
+      type:
+        required: false
+        type: string
+        # For backwards compatibility
+        default: "task-script"
+      tag:
+        type: string
+        required: true
+      ref:
+        type: string
+        required: false
+        default: ""
+      env:
+        type: string
+        required: true
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      ssh_key:
+        description: An SSH key with access to the Tetrascience Org
+        required: true
+
+jobs:
+  publish:
+    name: "Publish Artifact Tag to ${{ inputs.env }}"
+    environment: ${{ inputs.env }}
+    runs-on: ubuntu-latest
+    # Only run this job if it is either a pull request or if it is a tag that was pushed
+    if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/'))
+    steps:
+      # Checkout the code
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.tag }}
+
+      # Setup Python and Install: Poetry, Pipenv
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version || '3.7' }}
+      - run: |
+          pip install poetry pipenv
+
+      # Publish to correct targets
+      - name: "Build and Deploy to ${{ inputs.env }}"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+        # NOTE: update reference here to use a different version of the action
+        uses: tetrascience/ts-deploy-task-script-action@main
+        with:
+          type: ${{ inputs.type }}
+          namespace: ${{ inputs.namespace }}
+          slug: ${{ inputs.slug }}
+          ssh_key: ${{ secrets.ssh_key }}
