@@ -77,7 +77,7 @@ jobs:
     environment: ${{ inputs.env }}
     runs-on: ubuntu-latest
     # Only run this job if it is either a pull request or if it is a tag that was pushed
-    if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/') && contains(['DEV/UAT', 'PROD'], inputs.env && startsWith(inputs.tag, 'v')))
+    if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/') && contains(fromJson('["DEV/UAT", "PROD"]', inputs.env && startsWith(inputs.tag, 'v')))
     steps:
       # Checkout the code
       - name: Checkout
