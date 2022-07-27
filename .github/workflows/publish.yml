@@ -69,7 +69,6 @@ jobs:
     runs-on: ubuntu-latest
     if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/'))
     steps:
-      - name: Log Workflow Inputs
       - run: echo "${{ toJSON(inputs) }}"
 
   deploy-artifact:
