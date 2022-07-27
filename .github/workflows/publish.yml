@@ -87,7 +87,6 @@ jobs:
     name: "Deploy Tag:${{ inputs.tag }} to ${{ inputs.env }}"
     environment: ${{ inputs.env }}
     runs-on: ubuntu-latest
-    # Only run this job if it is either a pull request or if it is a tag that was pushed
     if: |
       github.event_name == 'push' &&
       startsWith(github.event.ref, 'refs/tags/') &&
