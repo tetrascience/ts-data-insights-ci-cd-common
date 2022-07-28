@@ -83,7 +83,6 @@ jobs:
 
 
   deploy-artifact:
-    needs: validate-workflow-inputs
     name: "Deploy Tag:${{ inputs.tag }} to ${{ inputs.env }}"
     environment: ${{ inputs.env }}
     runs-on: ubuntu-latest
