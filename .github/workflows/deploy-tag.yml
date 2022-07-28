@@ -20,10 +20,6 @@ on:
       tag:
         type: string
         required: true
-      ref:
-        type: string
-        required: false
-        default: ""
       env:
         type: string
         required: true
@@ -37,35 +33,26 @@ on:
         required: true
 
 jobs:
-  validate-deploy-workflow-inputs:
-    name: "Validate Environment for artifact deployment"
-    runs-on: ubuntu-latest
-    if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/'))
-    steps:
-      - run: |
-          echo "Inputs:"
-          echo "${{ toJSON(inputs) }}"
-
-          if [[ 'DEV/UAT' == ${{ inputs.env }} || 'PROD' = ${{ inputs.env }} ]]; then
-            echo "Artifact will be deployed to ${{ inputs.env }} environment"
-          else
-            echo "Invalid Environment: ${{ inputs.env }}"
-            echo "'inputs.env' must either be set to 'DEV/UAT' or 'PROD'"
-            exit 1
-          fi
-
-
   deploy-artifact:
-    needs: validate-deploy-workflow-inputs
     name: "Deploy Tag:${{ inputs.tag }} to ${{ inputs.env }}"
     environment: ${{ inputs.env }}
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'push' &&
       startsWith(github.event.ref, 'refs/tags/') &&
-      contains(fromJson('["DEV/UAT", "PROD"]'), inputs.env) &&
       startsWith(inputs.tag, 'v')
     steps:
+      # Validate environment
+      - run: |
+          echo "Validating Environment: ${{ inputs.env }}"
+          if [[ 'DEV/UAT' == ${{ inputs.env }} || 'PROD' == ${{ inputs.env }} ]]; then
+            echo "Artifact will be deploy to '${{ inputs.env }}' environment."
+          else
+            echo "Invalid Environment used: ${{ inputs.env }}"
+            echo "Environment must either be 'DEV/UAT' or 'PROD' "
+            exit 1
+          fi
+
       # Checkout the code
       - name: Checkout
         uses: actions/checkout@v3
