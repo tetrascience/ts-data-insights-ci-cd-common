@@ -36,7 +36,7 @@ on:
 
 jobs:
   publish-pull-request:
-    name: "Build and Publish Artifact for the Pull Request"
+    name: "Pull Request: Build and Publish Artifact"
     runs-on: ubuntu-latest
     # Only run this job if it is either a pull request or if it is a tag that was pushed
     if: github.event_name == 'pull_request'
@@ -64,24 +64,6 @@ jobs:
           slug: ${{ inputs.slug }}
           ssh_key: ${{ secrets.ssh_key }}
 
-  # validate-workflow-inputs:
-  #   name: "Validate env, tag and ref for artifact deployment"
-  #   runs-on: ubuntu-latest
-  #   if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/'))
-  #   steps:
-  #     - run: |
-  #         echo "Inputs:"
-  #         echo "${{ toJSON(inputs) }}"
-
-  #         if [[ 'DEV/UAT' == ${{ inputs.env }} || 'PROD' = ${{ inputs.env }} ]]; then
-  #           echo "Artifact will be deployed to ${{ inputs.env }} environment"
-  #         else
-  #           echo "Invalid Environment: ${{ inputs.env }}"
-  #           echo "'inputs.env' must either be set to 'DEV/UAT' or 'PROD'"
-  #           exit 1
-  #         fi
-
-
   deploy-artifact:
     name: "Deploy Tag:${{ inputs.tag }} to ${{ inputs.env }}"
     environment: ${{ inputs.env }}
@@ -89,9 +71,19 @@ jobs:
     if: |
       github.event_name == 'push' &&
       startsWith(github.event.ref, 'refs/tags/') &&
-      contains(fromJson('["DEV/UAT", "PROD"]'), inputs.env) &&
       startsWith(inputs.tag, 'v')
     steps:
+      # Validate environment
+      - run: |
+          echo "Validating Environment: ${{ inputs.env }}"
+          if [[ 'DEV/UAT' == ${{ inputs.env }} || 'PROD' == ${{ inputs.env }} ]]; then
+            echo "Artifact will be deploy to '${{ inputs.env }}' environment."
+          else
+            echo "Invalid Environment used: ${{ inputs.env }}"
+            echo "Environment must either be 'DEV/UAT' or 'PROD' "
+            exit 1
+          fi
+
       # Checkout the code
       - name: Checkout
         uses: actions/checkout@v3
