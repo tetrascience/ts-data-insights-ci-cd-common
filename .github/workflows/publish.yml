@@ -64,22 +64,22 @@ jobs:
           slug: ${{ inputs.slug }}
           ssh_key: ${{ secrets.ssh_key }}
 
-  validate-workflow-inputs:
-    name: "Validate env, tag and ref for artifact deployment"
-    runs-on: ubuntu-latest
-    if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/'))
-    steps:
-      - run: |
-          echo "Inputs:"
-          echo "${{ toJSON(inputs) }}"
+  # validate-workflow-inputs:
+  #   name: "Validate env, tag and ref for artifact deployment"
+  #   runs-on: ubuntu-latest
+  #   if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/'))
+  #   steps:
+  #     - run: |
+  #         echo "Inputs:"
+  #         echo "${{ toJSON(inputs) }}"
 
-          if [[ 'DEV/UAT' == ${{ inputs.env }} || 'PROD' = ${{ inputs.env }} ]]; then
-            echo "Artifact will be deployed to ${{ inputs.env }} environment"
-          else
-            echo "Invalid Environment: ${{ inputs.env }}"
-            echo "'inputs.env' must either be set to 'DEV/UAT' or 'PROD'"
-            exit 1
-          fi
+  #         if [[ 'DEV/UAT' == ${{ inputs.env }} || 'PROD' = ${{ inputs.env }} ]]; then
+  #           echo "Artifact will be deployed to ${{ inputs.env }} environment"
+  #         else
+  #           echo "Invalid Environment: ${{ inputs.env }}"
+  #           echo "'inputs.env' must either be set to 'DEV/UAT' or 'PROD'"
+  #           exit 1
+  #         fi
 
 
   deploy-artifact:
