@@ -74,9 +74,10 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
         # NOTE: update reference here to use a different version of the action
-        uses: tetrascience/ts-deploy-task-script-action@main
+        uses: tetrascience/ts-deploy-task-script-action@DEI-148-deploy-to-prod
         with:
           type: ${{ inputs.type }}
           namespace: ${{ inputs.namespace }}
           slug: ${{ inputs.slug }}
           ssh_key: ${{ secrets.ssh_key }}
+          deploy_target: ${{ inputs.env }}
