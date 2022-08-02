@@ -1,3 +1,7 @@
+# This workflow builds and publishes artifact's tag
+# to a particular environment (DEV/UAT or PROD)
+# It is called by Artifact's publish.yml, when a new tag is pushed
+
 name: Deploy Artifact:Tag to Environments
 
 on:
@@ -18,9 +22,12 @@ on:
         # For backwards compatibility
         default: "task-script"
       tag:
+        # The value git tag that is being deployed
         type: string
         required: true
       env:
+        # Environment in which, deployment is to be carried out
+        # Accepted values: DEV/UAT or PROD
         type: string
         required: true
     secrets:
@@ -43,6 +50,7 @@ jobs:
       startsWith(inputs.tag, 'v')
     steps:
       # Validate environment
+      # It should either be "DEV/UAT" or "PROD"
       - run: |
           echo "Validating Environment: ${{ inputs.env }}"
           if [[ 'DEV/UAT' == ${{ inputs.env }} || 'PROD' == ${{ inputs.env }} ]]; then
@@ -74,6 +82,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
         # NOTE: update reference here to use a different version of the action
+        # For now it points to 'main' as it is the only ref that supports
+        # doc only release
         uses: tetrascience/ts-deploy-task-script-action@main
         with:
           type: ${{ inputs.type }}

@@ -1,3 +1,5 @@
+# Depending on the artifact' type, run the unit tests or validation
+
 name: Run tests for artifact:tag
 
 on:
