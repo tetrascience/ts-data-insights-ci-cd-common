@@ -1,0 +1,262 @@
+name: Publish Artifact From Tag
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        type: string
+        default: "3.7"
+      namespace:
+        required: true
+        type: string
+      slug:
+        required: true
+        type: string
+      type:
+        required: true
+        type: string  
+      publish-to-dev-uat:
+        required: false
+        type: boolean
+        default: false
+      publish-to-prod:
+        required: false
+        type: boolean
+        default: false 
+      tag:
+        required: false
+        type: string
+        default: ""
+
+    secrets:
+      TEST_AWS_ACCESS_KEY_ID:
+        required: true
+      TEST_AWS_SECRET_ACCESS_KEY:
+        required: true
+      PROD_AWS_ACCESS_KEY_ID:
+        required: true
+      PROD_AWS_SECRET_ACCESS_KEY:
+        required: true
+      ssh_key:
+        description: An SSH key with access to the Tetrascience Org
+        required: true
+
+jobs:
+  determine-tag-and-ref:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.determine-tag.outputs.tag }}
+      ref: ${{ steps.determine-ref.outputs.ref }}
+
+    steps:
+      - id: determine-tag
+        name: "Determine tag to be published"
+        run: |
+          if [[ "${{ github.event.ref }}" =~ "refs/tags/" ]]; then
+            TAG=$(echo "${{ github.event.ref }}" | sed "s|refs/tags/||")
+            echo "Setting tag from github.event.ref: $TAG"
+          elif [[ "" != "${{ github.event.client_payload.tag }}" ]]; then
+            TAG="${{ github.event.client_payload.tag }}"
+            echo "Setting tag from client_payload: $TAG"
+          elif [[ "" != "${{ github.event.inputs.tag }}" ]]; then
+            TAG="${{ github.event.inputs.tag }}"
+            echo "Setting tag from github.event.inputs: $TAG"
+          elif [[ "" != "${{ inputs.tag }}" ]]; then
+            TAG="${{ inputs.tag }}"
+            echo "Setting tag from Input: $TAG"
+          else
+            echo "NO TAG PROVIDED"
+            echo "github.event.ref: ${{ github.event.ref }}"
+            exit 1
+          fi
+
+          echo "tag : $TAG"
+          echo "::echo::on"
+          echo "::set-output name=tag::$TAG"
+          echo "::echo::off"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - id: determine-ref
+        name: "Determine github commit ref to be used"
+        run: |
+          REF=""
+          if [[ "" != "${{ github.event.client_payload.reference }}" ]]; then
+            REF="${{ github.event.client_payload.reference }}"
+            echo "Setting reference from client_payload: $REF"
+          elif [[ "" != "${{ github.event.inputs.ref }}" ]]; then
+            REF="${{ github.event.inputs.ref }}"
+            echo "Setting ref from github.event.inputs: $REF"
+          elif [[ "" != "${{ inputs.reference }}" ]]; then
+            REF="${{ inputs.reference }}"
+            echo "Setting reference from Input: $REF"
+          fi
+
+          echo "ref : $REF"
+          echo "::echo::on"
+          echo "::set-output name=ref::$REF"
+          echo "::echo::off"
+          echo "ref=$REF" >> $GITHUB_ENV
+
+  debug-jobs:
+    needs: determine-tag-and-ref
+    runs-on: ubuntu-latest
+    steps:
+      - run : |
+          echo "${{ needs.determine-tag-and-ref.outputs.tag }}"
+          echo "${{ needs.determine-tag-and-ref.outputs.ref }}"
+
+  validate-tag:
+    needs: determine-tag-and-ref
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: "Validate Tag"
+        uses: tetrascience/ts-action-validate-and-tag@main
+        with:
+          tag: ${{ needs.determine-tag-and-ref.outputs.tag }}
+          ref: ${{ needs.determine-tag-and-ref.outputs.ref }}
+
+  run-task-script-tests:
+    needs: validate-tag
+    runs-on: ubuntu-latest
+    if: inputs.type == 'task-script'
+    steps:
+        # Checkout the code
+        - uses: actions/checkout@v2
+          with:
+            lfs: true
+            ref: ${{ inputs.ref }}
+        # Install a fixed version of python
+        - name: Set up Python
+          uses: actions/setup-python@v2
+          with:
+            python-version: ${{ inputs.python-version }}
+        # if there's a Pipfile, use pipenv
+        - name: Test with pipenv
+          if: hashFiles('Pipfile') != ''
+          run: |
+            pip install pipenv
+            pipenv sync --dev
+            pipenv run pip install pytest-cov
+            pipenv run python -m pytest -v --cov --cov-branch --cov-report xml
+        # check for a poetry lockfile (since we can't rely on pyproject.toml indicating a poetry project)
+        - name: Test with poetry
+          if: hashFiles('poetry.lock') != ''
+          run: |
+            pip install poetry
+            poetry install
+            poetry run pip install pytest-cov
+            poetry run python -m pytest -v --cov --cov-branch --cov-report xml
+        # no pipfile or poetry lockfile, so we'll just install pytest with pip and run that
+        - name: Test with pip
+          if: hashFiles('Pipfile') == '' && hashFiles('poetry.lock') == ''
+          run: |
+            pip install pytest pytest-cov
+            python -m pytest -v --cov --cov-branch --cov-report xml
+
+  run-ids-tests:
+    needs: validate-tag
+    runs-on: ubuntu-latest
+    if: inputs.type == 'ids'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.tag }}
+      - name: "Set up Python"
+        uses: actions/setup-python@v2
+      - name: "Run IDS validator"
+        run: |
+          pip install ts-ids-validator
+          python -m ids_validator --ids_dir .
+
+  publish-dev-uat:
+    if: ${{ always() }}
+    needs: [determine-tag-and-ref, run-task-script-tests, run-ids-tests]
+    runs-on: ubuntu-latest
+    environment: DEV/UAT
+    steps:
+      - id: validate-prev-jobs
+        name: "Validate Previous Jobs Results"
+        run: |
+          if [[ "${{ inputs.publish-to-dev-uat }}" != "true" ]]; then
+            err_msg= "'inputs.publish-to-dev-uat' is '${{ inputs.publish-to-dev-uat }}'. It must be set to true for publishing tag to DEV and UAT. Stopping..."
+            echo "::error:: $err_msg"
+            exit 1 
+          fi
+
+          echo "'inputs.publish-to-dev-uat' is '${{ inputs.publish-to-dev-uat }}'"
+          echo "Artifact will be deployed to DEV/UAT"
+
+          if [[ "${{ needs.run-task-script-tests.result }}" == "failure" ]]; then
+            echo "::error:: Job: run-task-script-tests failed. Stopping deployment"
+            exit 1
+          elif [[ "${{ needs.run-task-script-tests.result }}" == "failure" ]]; then
+            echo "::error:: Job: run-ids-tests failed. Stopping deployment"
+            exit 1
+          fi
+
+      # Checkout the code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.determine-tag-and-ref.outputs.tag }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version || '3.7' }}
+
+      - id: setup-python-dependency-manager
+        name: "Install Poetry and Pipenv"
+        run: |
+          pip install poetry pipenv
+
+      # Publish to correct targets
+      - name: "Build and Deploy to ${{ inputs.env }}"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+
+        # NOTE: update reference here to use a different version of the action
+        # For now it points to 'main' as it is the only ref that supports
+        # doc only release
+        uses: tetrascience/ts-deploy-task-script-action@main
+        with:
+          type: ${{ inputs.type }}
+          namespace: ${{ inputs.namespace }}
+          slug: ${{ inputs.slug }}
+          ssh_key: ${{ secrets.ssh_key }}
+
+      - name: "Log Artifact URL"
+        run: |
+          ARTIFACT_TYPE="${{ inputs.type }}"
+          if [[ ${{ inputs.type }} == "task-script" ]]; then
+            ARTIFACT_TYPE="task-scripts"
+          elif [[ ${{ inputs.type }} == "protocol" ]]; then
+            ARTIFACT_TYPE="master-scripts"
+          fi
+
+          DEV_URL="https://tetrascience-dev.com/artifacts?key=${{ inputs.namespace }}%2F${{ inputs.slug }}&type=$ARTIFACT_TYPE&version=${{ needs.determine-tag-and-ref.outputs.tag }}"
+          URL_URL="https://tetrascience-uat.com/artifacts?key=${{ inputs.namespace }}%2F${{ inputs.slug }}&type=$ARTIFACT_TYPE&version=${{ needs.determine-tag-and-ref.outputs.tag }}"
+
+          echo "::notice::DEV Address: $DEV_URL"
+          echo "::notice::UAT Address: $UAT_URL"
+
+  publish-production:
+    needs: [determine-tag-and-ref, publish-dev-uat]
+    runs-on: ubuntu-latest
+    steps:
+      - id: validate-prev-jobs
+        name: "Validate Previous Jobs Results"
+        run: |
+          if [[ "${{ inputs.publish-to-prod }}" != "true" ]]; then
+            err_msg= "'inputs.publish-to-prod' is '${{ inputs.publish-to-prod }}'. It must be set to 'true' for publishing tag to PRODUCTION. Stopping..."
+            echo "::error:: $err_msg"
+            exit 1
+          fi
+
+          echo "'inputs.publish-to-prod' is '${{ inputs.publish-to-prod }}'"
+          echo "Artifact will be deployed to PRODUCTION."
+
+

@@ -1,0 +1,76 @@
+# Depending on the artifact' type, run the unit tests or validation
+
+name: Run tests for artifact:tag
+
+on:
+  workflow_call:
+    inputs:
+      artifact-type:
+        required: true
+        type: string
+      ref:
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  protocol-tests:
+    name: "Protocol tests"
+    if: inputs.artifact-type == 'protocol'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "No Tests needed for protocol"
+
+  ids-run-schema-validation:
+    name: "IDS: Validate IDS"
+    if: inputs.artifact-type == 'ids'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+      - name: "Set up Python"
+        uses: actions/setup-python@v2
+      - name: "Run IDS validator"
+        run: |
+          pip install ts-ids-validator
+          python -m ids_validator --ids_dir .
+
+  task-script-test:
+    name: "Task-Script: Run pytest"
+    if: inputs.artifact-type == 'task-script'
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+          ref: ${{ inputs.ref }}
+      # Install a fixed version of python
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version }}
+      # if there's a Pipfile, use pipenv
+      - name: Test with pipenv
+        if: hashFiles('Pipfile') != ''
+        run: |
+          pip install pipenv
+          pipenv sync --dev
+          pipenv run pip install pytest-cov
+          pipenv run python -m pytest -v --cov --cov-branch --cov-report xml
+      # check for a poetry lockfile (since we can't rely on pyproject.toml indicating a poetry project)
+      - name: Test with poetry
+        if: hashFiles('poetry.lock') != ''
+        run: |
+          pip install poetry
+          poetry install
+          poetry run pip install pytest-cov
+          poetry run python -m pytest -v --cov --cov-branch --cov-report xml
+      # no pipfile or poetry lockfile, so we'll just install pytest with pip and run that
+      - name: Test with pip
+        if: hashFiles('Pipfile') == '' && hashFiles('poetry.lock') == ''
+        run: |
+          pip install pytest pytest-cov
+          python -m pytest -v --cov --cov-branch --cov-report xml
