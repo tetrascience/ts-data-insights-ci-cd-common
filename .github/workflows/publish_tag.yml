@@ -120,7 +120,7 @@ jobs:
   run-task-script-tests:
     needs: validate-tag
     runs-on: ubuntu-latest
-    if: inputs.type === 'task-script'
+    if: inputs.type == 'task-script'
     steps:
         # Checkout the code
         - uses: actions/checkout@v2
@@ -158,7 +158,7 @@ jobs:
   run-ids-tests:
     needs: validate-tag
     runs-on: ubuntu-latest
-    if: inputs.type === 'ids'
+    if: inputs.type == 'ids'
     steps:
       - uses: actions/checkout@v3
         with:
