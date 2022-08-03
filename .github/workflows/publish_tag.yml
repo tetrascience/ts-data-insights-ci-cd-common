@@ -122,5 +122,5 @@ jobs:
       - name: "Validate Tag"
         uses: tetrascience/ts-action-validate-and-tag@main
         with:
-          tag: ${{ needs.determine-tag-and-ref.outputs.artifact_tag }}
+          tag: ${{ needs.determine-tag-and-ref.outputs.tag }}
           ref: ${{ needs.determine-tag-and-ref.outputs.ref }}
