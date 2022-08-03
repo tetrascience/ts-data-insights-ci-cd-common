@@ -172,12 +172,26 @@ jobs:
 
   publish-dev-uat:
     if: ${{ always() }}
-    needs: [run-task-script-tests, run-ids-tests]
+    needs: [determine-tag-and-ref, run-task-script-tests, run-ids-tests]
     runs-on: ubuntu-latest
     steps:
       - id: validate-prev-jobs
-        name: "Validate Previous Jobs Outputs"
+        name: "Validate Previous Jobs Results"
         run: |
-          echo "${{ inputs.publish-to-dev-uat }}"
-          echo "::group::NEEDS"
-          echo "${{ toJSON(needs) }}"
+          if [[ "${{ inputs.publish-to-dev-uat }}" != "true" ]]; then
+            echo "::error::'inputs.publish-to-dev-uat' is '${{ inputs.publish-to-dev-uat }}'"
+            echo "::error::It must be set to true for publishing tag to DEV and UAT. Stopping..."
+            exit 1
+          else:
+            echo "'inputs.publish-to-dev-uat' is '${{ inputs.publish-to-dev-uat }}'"
+            echo "Artifact will be deployed to DEV/UAT"
+          fi
+
+          if [[ "${{ needs.run-task-script-tests.result }}" == "failure" ]]; then
+            echo "::error:: Job: run-task-script-tests failed. Stopping deployment"
+            exit 1
+          elif [[ "${{ needs.run-task-script-tests.result }}" == "failure" ]]; then
+            echo "::error:: Job: run-ids-tests failed. Stopping deployment"
+            exit 1
+          fi
+
