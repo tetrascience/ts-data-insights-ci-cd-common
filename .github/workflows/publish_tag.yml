@@ -119,6 +119,9 @@ jobs:
     needs: determine-tag-and-ref
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
       - name: "Validate Tag"
         uses: tetrascience/ts-action-validate-and-tag@main
         with:
