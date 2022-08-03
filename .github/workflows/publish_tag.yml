@@ -174,18 +174,19 @@ jobs:
     if: ${{ always() }}
     needs: [determine-tag-and-ref, run-task-script-tests, run-ids-tests]
     runs-on: ubuntu-latest
+    environment: DEV/UAT
     steps:
       - id: validate-prev-jobs
         name: "Validate Previous Jobs Results"
         run: |
           if [[ "${{ inputs.publish-to-dev-uat }}" != "true" ]]; then
-            echo "::error::'inputs.publish-to-dev-uat' is '${{ inputs.publish-to-dev-uat }}'"
-            echo "::error::It must be set to true for publishing tag to DEV and UAT. Stopping..."
-            exit 1
-          else:
-            echo "'inputs.publish-to-dev-uat' is '${{ inputs.publish-to-dev-uat }}'"
-            echo "Artifact will be deployed to DEV/UAT"
+            err_msg= "'inputs.publish-to-dev-uat' is '${{ inputs.publish-to-dev-uat }}'. It must be set to true for publishing tag to DEV and UAT. Stopping..."
+            echo "::error:: $err_msg"
+            exit 1 
           fi
+
+          echo "'inputs.publish-to-dev-uat' is '${{ inputs.publish-to-dev-uat }}'"
+          echo "Artifact will be deployed to DEV/UAT"
 
           if [[ "${{ needs.run-task-script-tests.result }}" == "failure" ]]; then
             echo "::error:: Job: run-task-script-tests failed. Stopping deployment"
@@ -194,4 +195,52 @@ jobs:
             echo "::error:: Job: run-ids-tests failed. Stopping deployment"
             exit 1
           fi
+
+      # Checkout the code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.determine-tag-and-ref.outputs.tag }}
+
+      # Setup Python and Install: Poetry, Pipenv
+      - id: setup-python
+        name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version || '3.7' }}
+        run: |
+          pip install poetry pipenv
+
+      # Publish to correct targets
+      - name: "Build and Deploy to ${{ inputs.env }}"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+
+        # NOTE: update reference here to use a different version of the action
+        # For now it points to 'main' as it is the only ref that supports
+        # doc only release
+        uses: tetrascience/ts-deploy-task-script-action@main
+        with:
+          type: ${{ inputs.type }}
+          namespace: ${{ inputs.namespace }}
+          slug: ${{ inputs.slug }}
+          ssh_key: ${{ secrets.ssh_key }}
+
+  publish-production:
+    needs: [determine-tag-and-ref, publish-dev-uat]
+    runs-on: ubuntu-latest
+    steps:
+      - id: validate-prev-jobs
+        name: "Validate Previous Jobs Results"
+        run: |
+          if [[ "${{ inputs.publish-to-prod }}" != "true" ]]; then
+            err_msg= "'inputs.publish-to-prod' is '${{ inputs.publish-to-prod }}'. It must be set to 'true' for publishing tag to PRODUCTION. Stopping..."
+            echo "::error:: $err_msg"
+            exit 1
+          fi
+
+          echo "'inputs.publish-to-prod' is '${{ inputs.publish-to-prod }}'"
+          echo "Artifact will be deployed to PRODUCTION."
+
 
