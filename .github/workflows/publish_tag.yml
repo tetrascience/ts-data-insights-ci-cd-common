@@ -57,7 +57,7 @@ jobs:
           echo "${{ toJSON(github.event.client_payload) }}"
           echo "=== EVENT ==="
           echo "::group::EVENT"
-          echo "${{ toJSON(github.event) }}"
+          echo "${{ toJSON(github.event.inputs) }}"
           echo "=== INPUTS ==="
           echo "::group::INPUTS"
           echo "${{ toJSON(inputs) }}"
@@ -94,8 +94,8 @@ jobs:
             REF="${{ github.event.client_payload.reference }}"
             echo "Setting reference from client_payload: $REF"
           elif [[ "" != "${{ github.event.inputs.ref }}" ]]; then
-            TAG="${{ github.event.event.inputs.reg }}"
-            echo "Setting ref from github.event.inputs: $TAG"
+            REG="${{ github.event.event.inputs.ref }}"
+            echo "Setting ref from github.event.inputs: $REF"
           elif [[ "" != "${{ inputs.reference }}" ]]; then
             REF="${{ inputs.reference }}"
             echo "Setting reference from Input: $REF"
