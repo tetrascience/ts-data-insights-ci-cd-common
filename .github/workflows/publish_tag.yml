@@ -86,13 +86,5 @@ jobs:
           echo "::echo::off"
           echo "ref=$REF" >> $GITHUB_ENV
 
-  debug_vars:
-    runs-on: ubuntu-latest
-    needs: determine-tag-and-ref
-    steps:
-      run: |
-        echo "TAG = ${{ needs.determine-tag-and-ref.outputs.tag }}"
-        echo "REF = ${{ needs.determine-tag-and-ref.outputs.ref }}"
-
 
 
