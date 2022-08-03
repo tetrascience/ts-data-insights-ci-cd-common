@@ -28,9 +28,9 @@ on:
         default: ""
 
     secrets:
-      AWS_ACCESS_KEY_ID:
+      TEST_AWS_ACCESS_KEY_ID:
         required: true
-      AWS_SECRET_ACCESS_KEY:
+      TEST_AWS_SECRET_ACCESS_KEY:
         required: true
       ssh_key:
         description: An SSH key with access to the Tetrascience Org
