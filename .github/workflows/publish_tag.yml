@@ -61,13 +61,16 @@ jobs:
           echo "=== INPUTS ==="
           echo "::group::INPUTS"
           echo "${{ toJSON(inputs) }}"
-          
+
           if [[ "${{ github.event.ref }}" =~ "refs/tags/" ]]; then
             TAG=$(echo "${{ github.event.ref }}" | sed "s|refs/tags/||")
             echo "Setting tag from github.event.ref: $TAG"
           elif [[ "" != "${{ github.event.client_payload.tag }}" ]]; then
             TAG="${{ github.event.client_payload.tag }}"
             echo "Setting tag from client_payload: $TAG"
+          elif [[ "" != "${{ github.event.inputs.tag }}" ]]; then
+            TAG="${{ github.event.event.inputs.tag }}"
+            echo "Setting tag from github.event.inputs: $TAG"
           elif [[ "" != "${{ inputs.tag }}" ]]; then
             TAG="${{ inputs.tag }}"
             echo "Setting tag from Input: $TAG"
@@ -90,6 +93,9 @@ jobs:
           if [[ "" != "${{ github.event.client_payload.reference }}" ]]; then
             REF="${{ github.event.client_payload.reference }}"
             echo "Setting reference from client_payload: $REF"
+          elif [[ "" != "${{ github.event.inputs.ref }}" ]]; then
+            TAG="${{ github.event.event.inputs.reg }}"
+            echo "Setting ref from github.event.inputs: $TAG"
           elif [[ "" != "${{ inputs.reference }}" ]]; then
             REF="${{ inputs.reference }}"
             echo "Setting reference from Input: $REF"
