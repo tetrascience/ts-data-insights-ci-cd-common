@@ -1,0 +1,99 @@
+name: Publish Artifact From Tag
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        type: string
+        default: "3.7"
+      namespace:
+        required: true
+        type: string
+      slug:
+        required: true
+        type: string
+      type:
+        required: true
+        type: string  
+      publish-to-test:
+        required: false
+        type: boolean
+        default: false
+      publish-to-prod:
+        required: false
+        type: boolean
+        default: false 
+      tag:
+        required: false
+        type: string
+        default: ""
+
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      ssh_key:
+        description: An SSH key with access to the Tetrascience Org
+        required: true
+
+jobs:
+  determine-tag-and-ref:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.determine-tag.outputs.tag }}
+      ref: ${{ steps.determine-ref.outputs.ref }}
+
+    steps:
+      - id: determine-tag
+        name: "Determine tag to be published"
+        run: |
+          if [[ "${{ github.event.ref }}" =~ "refs/tags/" ]]; then
+            TAG=$(echo "${{ github.event.ref }}" | sed "s|refs/tags/||")
+            echo "Setting tag from github.event.ref: $TAG"
+          elif [[ "" != "${{ github.event.client_payload.tag }}" ]]; then
+            TAG="${{ github.event.client_payload.tag }}"
+            echo "Setting tag from client_payload: $TAG"
+          elif [[ "" != "${{ inputs.tag }}" ]]; then
+            TAG="${{ inputs.tag }}"
+            echo "Setting tag from Input: $TAG"
+          else
+            echo "NO TAG PROVIDED"
+            echo "github.event.ref: ${{ github.event.ref }}"
+            exit 1
+          fi
+
+          echo "tag : $TAG"
+          echo "::echo::on"
+          echo "::set-output name=tag::$TAG"
+          echo "::echo::off"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - id: determine-ref
+        name: "Determine github commit ref to be used"
+        run: |
+          REF=""
+          if [[ "" != "${{ github.event.client_payload.reference }}" ]]; then
+            REF="${{ github.event.client_payload.reference }}"
+            echo "Setting reference from client_payload: $REF"
+          elif [[ "" != "${{ inputs.reference }}" ]]; then
+            REF="${{ inputs.reference }}"
+            echo "Setting reference from Input: $REF"
+          fi
+
+          echo "ref : $REF"
+          echo "::echo::on"
+          echo "::set-output name=ref::$REF"
+          echo "::echo::off"
+          echo "ref=$REF" >> $GITHUB_ENV
+
+  debug_vars:
+    runs-on: ubuntu-latest
+    needs: determine-tag-and-ref
+    steps:
+      name: "print_vars"
+      run: |
+        echo "TAG = ${{ needs.determine-tag-and-ref.outputs.tag }}"
+        echo "REF = ${{ needs.determine-tag-and-ref.outputs.ref }}"
+
+
+
