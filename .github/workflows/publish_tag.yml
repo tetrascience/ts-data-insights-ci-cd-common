@@ -94,7 +94,7 @@ jobs:
             REF="${{ github.event.client_payload.reference }}"
             echo "Setting reference from client_payload: $REF"
           elif [[ "" != "${{ github.event.inputs.ref }}" ]]; then
-            REG="${{ github.event.inputs.ref }}"
+            REF="${{ github.event.inputs.ref }}"
             echo "Setting ref from github.event.inputs: $REF"
           elif [[ "" != "${{ inputs.reference }}" ]]; then
             REF="${{ inputs.reference }}"
