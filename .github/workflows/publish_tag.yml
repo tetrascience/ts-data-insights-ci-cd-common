@@ -115,3 +115,12 @@ jobs:
           echo "${{ needs.determine-tag-and-ref.outputs.tag }}"
           echo "${{ needs.determine-tag-and-ref.outputs.ref }}"
 
+  validate-tag:
+    needs: determine-tag-and-ref
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Validate Tag"
+        uses: tetrascience/ts-action-validate-and-tag@main
+        with:
+          tag: ${{ needs.determine-tag-and-ref.outputs.artifact_tag }}
+          ref: ${{ needs.determine-tag-and-ref.outputs.ref }}
