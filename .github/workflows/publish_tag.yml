@@ -237,8 +237,8 @@ jobs:
             ARTIFACT_TYPE="master-scripts"
           fi
 
-          DEV_URL=https://tetrascience-dev.com/artifacts?key=${{ inputs.namespace }}%2F${{ inputs.slug }}&type=$ARTIFACT_TYPE&version=${{ needs.determine-tag-and-ref.outputs.tag }}
-          URL_URL=https://tetrascience-uat.com/artifacts?key=${{ inputs.namespace }}%2F${{ inputs.slug }}&type=$ARTIFACT_TYPE&version=${{ needs.determine-tag-and-ref.outputs.tag }}
+          DEV_URL="https://tetrascience-dev.com/artifacts?key=${{ inputs.namespace }}%2F${{ inputs.slug }}&type=$ARTIFACT_TYPE&version=${{ needs.determine-tag-and-ref.outputs.tag }}"
+          URL_URL="https://tetrascience-uat.com/artifacts?key=${{ inputs.namespace }}%2F${{ inputs.slug }}&type=$ARTIFACT_TYPE&version=${{ needs.determine-tag-and-ref.outputs.tag }}"
 
           echo "::notice::DEV Address: $DEV_URL"
           echo "::notice::UAT Address: $UAT_URL"
