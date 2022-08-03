@@ -202,12 +202,13 @@ jobs:
         with:
           ref: ${{ needs.determine-tag-and-ref.outputs.tag }}
 
-      # Setup Python and Install: Poetry, Pipenv
-      - id: setup-python
-        name: Set up Python
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: ${{ inputs.python-version || '3.7' }}
+
+      - id: setup-python-dependency-manager
+        name: "Install Poetry and Pipenv"
         run: |
           pip install poetry pipenv
 
