@@ -69,7 +69,7 @@ jobs:
             TAG="${{ github.event.client_payload.tag }}"
             echo "Setting tag from client_payload: $TAG"
           elif [[ "" != "${{ github.event.inputs.tag }}" ]]; then
-            TAG="${{ github.event.event.inputs.tag }}"
+            TAG="${{ github.event.inputs.tag }}"
             echo "Setting tag from github.event.inputs: $TAG"
           elif [[ "" != "${{ inputs.tag }}" ]]; then
             TAG="${{ inputs.tag }}"
@@ -94,7 +94,7 @@ jobs:
             REF="${{ github.event.client_payload.reference }}"
             echo "Setting reference from client_payload: $REF"
           elif [[ "" != "${{ github.event.inputs.ref }}" ]]; then
-            REG="${{ github.event.event.inputs.ref }}"
+            REG="${{ github.event.inputs.ref }}"
             echo "Setting ref from github.event.inputs: $REF"
           elif [[ "" != "${{ inputs.reference }}" ]]; then
             REF="${{ inputs.reference }}"
