@@ -51,6 +51,17 @@ jobs:
       - id: determine-tag
         name: "Determine tag to be published"
         run: |
+
+          echo "===CLIENT PAYLOAD==="
+          echo "::group::CLIENT_PAYLOAD"
+          echo "${{ toJSON(github.event.client_payload) }}"
+          echo "=== EVENT ==="
+          echo "::group::EVENT"
+          echo "${{ toJSON(github.event) }}"
+          echo "=== INPUTS ==="
+          echo "::group::INPUTS"
+          echo "${{ toJSON(inputs) }}"
+          
           if [[ "${{ github.event.ref }}" =~ "refs/tags/" ]]; then
             TAG=$(echo "${{ github.event.ref }}" | sed "s|refs/tags/||")
             echo "Setting tag from github.event.ref: $TAG"
