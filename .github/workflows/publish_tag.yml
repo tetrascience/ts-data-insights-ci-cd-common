@@ -32,6 +32,10 @@ on:
         required: true
       TEST_AWS_SECRET_ACCESS_KEY:
         required: true
+      PROD_AWS_ACCESS_KEY_ID:
+        required: true
+      PROD_AWS_SECRET_ACCESS_KEY:
+        required: true
       ssh_key:
         description: An SSH key with access to the Tetrascience Org
         required: true
