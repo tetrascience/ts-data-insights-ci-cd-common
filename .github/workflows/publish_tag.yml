@@ -14,7 +14,7 @@ on:
       type:
         required: true
         type: string  
-      publish-to-test:
+      publish-to-dev-uat:
         required: false
         type: boolean
         default: false
@@ -51,17 +51,6 @@ jobs:
       - id: determine-tag
         name: "Determine tag to be published"
         run: |
-
-          echo "===CLIENT PAYLOAD==="
-          echo "::group::CLIENT_PAYLOAD"
-          echo "${{ toJSON(github.event.client_payload) }}"
-          echo "=== EVENT ==="
-          echo "::group::EVENT"
-          echo "${{ toJSON(github.event.inputs) }}"
-          echo "=== INPUTS ==="
-          echo "::group::INPUTS"
-          echo "${{ toJSON(inputs) }}"
-
           if [[ "${{ github.event.ref }}" =~ "refs/tags/" ]]; then
             TAG=$(echo "${{ github.event.ref }}" | sed "s|refs/tags/||")
             echo "Setting tag from github.event.ref: $TAG"
@@ -127,3 +116,68 @@ jobs:
         with:
           tag: ${{ needs.determine-tag-and-ref.outputs.tag }}
           ref: ${{ needs.determine-tag-and-ref.outputs.ref }}
+
+  run-task-script-tests:
+    needs: validate-tag
+    runs-on: ubuntu-latest
+    if: inputs.type === 'task-script'
+    steps:
+        # Checkout the code
+        - uses: actions/checkout@v2
+          with:
+            lfs: true
+            ref: ${{ inputs.ref }}
+        # Install a fixed version of python
+        - name: Set up Python
+          uses: actions/setup-python@v2
+          with:
+            python-version: ${{ inputs.python-version }}
+        # if there's a Pipfile, use pipenv
+        - name: Test with pipenv
+          if: hashFiles('Pipfile') != ''
+          run: |
+            pip install pipenv
+            pipenv sync --dev
+            pipenv run pip install pytest-cov
+            pipenv run python -m pytest -v --cov --cov-branch --cov-report xml
+        # check for a poetry lockfile (since we can't rely on pyproject.toml indicating a poetry project)
+        - name: Test with poetry
+          if: hashFiles('poetry.lock') != ''
+          run: |
+            pip install poetry
+            poetry install
+            poetry run pip install pytest-cov
+            poetry run python -m pytest -v --cov --cov-branch --cov-report xml
+        # no pipfile or poetry lockfile, so we'll just install pytest with pip and run that
+        - name: Test with pip
+          if: hashFiles('Pipfile') == '' && hashFiles('poetry.lock') == ''
+          run: |
+            pip install pytest pytest-cov
+            python -m pytest -v --cov --cov-branch --cov-report xml
+
+  run-ids-tests:
+    needs: validate-tag
+    runs-on: ubuntu-latest
+    if: inputs.type === 'ids'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.tag }}
+      - name: "Set up Python"
+        uses: actions/setup-python@v2
+      - name: "Run IDS validator"
+        run: |
+          pip install ts-ids-validator
+          python -m ids_validator --ids_dir .
+
+  publish-dev-uat:
+    if: ${{ always() }}
+    needs: [run-task-tests, run-ids-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - id: validate-prev-jobs
+        name: "Validate Previous Jobs Outputs"
+        run: |
+          echo "${{ inputs.publish-to-dev-uat }}"
+          echo "::group::NEEDS"
+          echo "${{ toJSON(need) }}"
