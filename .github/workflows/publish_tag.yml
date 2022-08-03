@@ -172,7 +172,7 @@ jobs:
 
   publish-dev-uat:
     if: ${{ always() }}
-    needs: [run-task-tests, run-ids-tests]
+    needs: [run-task-script-tests, run-ids-tests]
     runs-on: ubuntu-latest
     steps:
       - id: validate-prev-jobs
