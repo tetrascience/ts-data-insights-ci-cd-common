@@ -180,4 +180,4 @@ jobs:
         run: |
           echo "${{ inputs.publish-to-dev-uat }}"
           echo "::group::NEEDS"
-          echo "${{ toJSON(need) }}"
+          echo "${{ toJSON(needs) }}"
