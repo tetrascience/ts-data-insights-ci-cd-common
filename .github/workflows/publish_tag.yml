@@ -228,6 +228,21 @@ jobs:
           slug: ${{ inputs.slug }}
           ssh_key: ${{ secrets.ssh_key }}
 
+      - name: "Log Artifact URL"
+        run: |
+          ARTIFACT_TYPE="${{ inputs.type }}"
+          if [[ ${{ inputs.type }} == "task-script" ]]; then
+            ARTIFACT_TYPE="task-scripts"
+          elif [[ ${{ inputs.type }} == "protocol" ]]; then
+            ARTIFACT_TYPE="master-scripts"
+          fi
+
+          DEV_URL=https://tetrascience-dev.com/artifacts?key=${{ inputs.namespace }}%2F${{ inputs.slug }}&type=$ARTIFACT_TYPE&version=${{ needs.determine-tag-and-ref.outputs.tag }}
+          URL_URL=https://tetrascience-uat.com/artifacts?key=${{ inputs.namespace }}%2F${{ inputs.slug }}&type=$ARTIFACT_TYPE&version=${{ needs.determine-tag-and-ref.outputs.tag }}
+
+          echo "::notice::DEV Address: $DEV_URL"
+          echo "::notice::UAT Address: $UAT_URL"
+
   publish-production:
     needs: [determine-tag-and-ref, publish-dev-uat]
     runs-on: ubuntu-latest
